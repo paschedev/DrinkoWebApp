@@ -2,9 +2,9 @@
 
 # Sistema ágil de compra en barras de eventos[cite: 2]
 
-* **Equipo de Trabajo**: Javier Isaias Ovelar y Gastón Paschetta[cite: 2].
-* **Tutor Asignado**: Oscar Londero[cite: 2].
-* **Repositorio Oficial**: https://github.com/paschedev/DrinkoWebApp[cite: 2].
+* **Equipo de Trabajo**: Javier Isaias Ovelar y Gastón Paschetta
+* **Tutor Asignado**: Oscar Londero.
+* **Repositorio Oficial**: https://github.com/paschedev/DrinkoWebApp
 
 ## 1. Definición del Problema
 * La experiencia de compra de bebidas en barras de eventos masivos y discotecas presenta un alto nivel de fricción[cite: 2].
