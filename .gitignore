@@ -1,24 +1,10 @@
-# Nestjs specific
-/dist
-/node_modules
-/build
-/tmp
+# Dependencias
+node_modules/
 
-# Logs
-logs
-*.log
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
+# Compilación de NestJS y Next.js
+dist/
+.next/
 
-# dotenv environment variable files
+# Variables de entorno
 .env
-.env.development
-.env.test
-.env.production
-
-# temp directory
-.temp
-.tmp
+.env.local

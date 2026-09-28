@@ -50,12 +50,32 @@
 | **Fuera de Alcance** | Gestión de Proveedores | El sistema no manejará control de stock complejo ni integración con proveedores; el stock por evento es un número opcional que solo limita la venta. |
 
 ## 5. Stack Tecnológico y Arquitectura Cloud
+* **Arquitectura**: aplicación web cliente-servidor. El backend es un monolito modular en capas y el frontend es una sola aplicación con tres áreas: cliente, barra y Panel del Organizador. El detalle está en [docs/arquitectura.md](docs/arquitectura.md).
 * **Frontend**: Next.js con TypeScript. Su renderizado optimizado ayuda a que el catálogo cargue rápido al escanear el QR, algo importante para la UX durante el evento. El frontend será desplegado en Vercel para aprovechar el CDN global y el deploy continuo.
 * **Backend (API Rest)**: NestJS con TypeScript. Ofrece una arquitectura modular y tipada. Su entorno Node.js maneja bien la asincronía, lo que le permite atender varias peticiones de compra simultáneas sin bloquear el servidor. Será alojado en Railway.
 * **Base de Datos**: PostgreSQL. Es un motor relacional con soporte de transacciones, que usamos para que la reserva de stock y el canje de tickets se hagan de forma atómica, con una estructura de datos predecible y fácil de mantener respecto a motores NoSQL.
+* **Acceso a datos**: Prisma, con tipos generados desde el esquema y migraciones versionadas.
 * **Infraestructura Interna**: La base de datos y el backend estarán configurados dentro del mismo entorno de proyecto en Railway, lo que reduce la latencia de la conexión interna y facilita el despliegue automático desde GitHub.
 * **Concurrencia**: como objetivo de diseño tomamos un evento de hasta 1.500 asistentes, con un pico de 100 compras por minuto. No es un límite garantizado sino la carga con la que vamos a probar el sistema. La consistencia bajo carga no depende de la velocidad del servidor sino de que la reserva de stock y el canje se resuelvan como operaciones atómicas en PostgreSQL: aunque dos personas compren la última unidad o dos barras escaneen el mismo QR al mismo tiempo, solo una operación se concreta.
 
-## 6. Control de Versiones y Auditoría
+## 6. Estructura del Repositorio
+```
+/
+├── README.md
+├── backend/          API REST en NestJS (solo carpetas en esta entrega)
+├── frontend/         App Next.js con las áreas cliente, barra y panel (solo carpetas en esta entrega)
+├── database/
+│   ├── der.md        diagrama entidad-relación
+│   ├── ddl.sql       creación de tablas, claves e índices
+│   └── dml-seed.sql  datos de ejemplo
+└── docs/
+    ├── arquitectura.md
+    ├── modulos.md
+    └── informes/     informes de avance
+```
+
+Los nombres de tablas, columnas, variables y archivos de código están en inglés; la documentación, en español.
+
+## 7. Control de Versiones y Auditoría
 * Todo el código fuente del proyecto se gestionará utilizando Git. 
 * El repositorio de GitHub actuará como fuente oficial para la auditoría del trabajo colaborativo, la revisión de ramas y el seguimiento constante de commits por parte de la cátedra y el tutor.
