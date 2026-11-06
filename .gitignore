@@ -8,3 +8,5 @@ dist/
 # Variables de entorno
 .env
 .env.local
+*.tsbuildinfo
+next-env.d.ts

@@ -1,0 +1,15 @@
+# Base de datos local para desarrollo. Usa el puerto 5433 para no chocar con otro PostgreSQL.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: drinko
+      POSTGRES_PASSWORD: drinko
+      POSTGRES_DB: drinko
+    ports:
+      - "5433:5432"
+    volumes:
+      - drinko-db:/var/lib/postgresql/data
+
+volumes:
+  drinko-db:
