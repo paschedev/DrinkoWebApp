@@ -202,3 +202,126 @@ button:disabled {
   background: #dcfce7;
   color: var(--success);
 }
+
+/* Formularios */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.form label,
+.field-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+input {
+  font-size: 1rem;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* Barra */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 8px 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.tabs a {
+  padding: 10px 12px;
+  text-decoration: none;
+  color: var(--muted);
+}
+
+.tabs a.active {
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+}
+
+.scanner {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  min-height: 240px;
+}
+
+.result {
+  border-radius: 16px;
+  padding: 24px 16px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.result.ok {
+  background: var(--success);
+}
+
+.result.fail {
+  background: var(--error);
+}
+
+.result-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.result-items {
+  font-size: 1.4rem;
+  line-height: 1.6;
+}
+
+.result button.secondary {
+  background: #ffffff;
+  border: none;
+}
+
+.card.unavailable {
+  opacity: 0.6;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.field-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.small-input {
+  width: 96px;
+}
+
+.small-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 1.2rem;
+}
+
+.demand-count {
+  font-size: 1.4rem;
+  font-weight: 700;
+}

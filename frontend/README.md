@@ -39,6 +39,18 @@ Las llamadas a `/api/...` las reenvía Next.js al backend indicado en `BACKEND_U
 | `/tickets` | Mis tickets, con el QR de retiro |
 | `/t/[token]` | Un ticket suelto |
 
+## Barra
+
+| Ruta | Pantalla |
+| :--- | :--- |
+| `/login` | Ingreso de organizadores y staff |
+| `/bar` | Eventos en los que el usuario puede operar |
+| `/bar/[eventId]/scan` | Escáner de QR con la cámara (y carga manual del código). El resultado se muestra grande, en verde o en rojo |
+| `/bar/[eventId]/products` | Precio, disponibilidad y ajuste de stock |
+| `/bar/[eventId]/demand` | Lo vendido que todavía no se retiró, actualizado cada 15 segundos |
+
+La cámara del navegador solo funciona con HTTPS (o en `localhost`).
+
 El carrito se guarda en el navegador (`localStorage`). El cliente se identifica con una cookie httpOnly que crea el backend.
 
 El despliegue en Vercel está explicado en [docs/deploy.md](../docs/deploy.md).
