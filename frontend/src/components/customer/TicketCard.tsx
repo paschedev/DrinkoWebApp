@@ -30,12 +30,11 @@ export function TicketCard({ ticket }: { ticket: Ticket }) {
           <div className="qr">
             <QRCodeSVG value={ticket.token} size={220} marginSize={2} />
           </div>
-          <p className="muted">
-            Mostrá este QR en la barra. Se puede retirar hasta el {formatTime(ticket.redeemableUntil)}.
-          </p>
+          <p className="muted">Mostrá este QR en la barra.</p>
+          <p className="muted">Se puede retirar hasta el {formatTime(ticket.redeemableUntil)}</p>
         </>
       )}
-      {ticket.redeemedAt && <p className="muted">Retirado el {formatTime(ticket.redeemedAt)}.</p>}
+      {ticket.redeemedAt && <p className="muted">Retirado el {formatTime(ticket.redeemedAt)}</p>}
     </section>
   );
 }

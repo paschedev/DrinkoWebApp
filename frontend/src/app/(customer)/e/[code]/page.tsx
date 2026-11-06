@@ -34,7 +34,7 @@ export default function CatalogPage() {
     return (
       <main className="page">
         <h1>{catalog.name}</h1>
-        <p>El evento todavía no empezó. Empieza el {formatTime(catalog.startsAt)}.</p>
+        <p>El evento todavía no empezó. Empieza el {formatTime(catalog.startsAt)}</p>
       </main>
     );
   }
