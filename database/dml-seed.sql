@@ -36,9 +36,9 @@ FROM (VALUES
 ) AS p (name, category, requires_preparation)
 JOIN categories c ON c.name = p.category;
 
--- Empezó hace 1 hora y termina en 5, así queda en curso al cargar los datos.
+-- Empezó hace 1 hora y dura 30 días, así la demo queda en curso durante toda la evaluación.
 INSERT INTO events (organization_id, name, access_code, starts_at, ends_at) VALUES
-    ((SELECT id FROM organizations), 'Fiesta Demo', 'k7f3q9mx', now() - interval '1 hour', now() + interval '5 hours');
+    ((SELECT id FROM organizations), 'Fiesta Demo', 'k7f3q9mx', now() - interval '1 hour', now() + interval '30 days');
 
 INSERT INTO staff_assignments (event_id, user_id)
 SELECT e.id, u.id
