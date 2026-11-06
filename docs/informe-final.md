@@ -204,11 +204,11 @@ mejora = 1 / (1 − a·s) − 1
 
 El modelo da entre un 18 % y un 32 % más de clientes atendidos por hora en hora pico. El valor que documentamos, conservador, es **alrededor de +15 %**.
 
-**Cómo se traduce en ventas**: la estimación mide capacidad de atención, y esa capacidad aumenta las ventas por dos vías que se suman:
-1. **Más ventas por hora a lo largo del evento**: la barra atiende a más clientes en el mismo tiempo, así que en toda la duración del evento se concretan más ventas.
-2. **Menos gente que desiste**: con filas más cortas y la opción de comprar desde el celular, menos personas abandonan la compra al ver la fila llena.
+**Cómo se traduce en ventas**: hay dos factores, y los dos cuentan.
+1. **Más ventas por hora a lo largo de todo el evento**: la barra atiende más rápido, así que en la misma duración del evento se concretan más ventas. Es lo que estima el modelo: alrededor de +15 %.
+2. **Menos gente que desiste**: con filas más cortas, y con la opción de comprar desde el celular, menos personas abandonan la compra al ver la barra llena. Así se recupera demanda que hoy se pierde. Este factor es cualitativo: no está cuantificado ni incluido en el +15 %, por lo que el impacto real podría ser mayor.
 
-Además, el catálogo a la vista puede sumar un tercer efecto: clientes que eligen productos que no habrían pedido en la barra. Ninguno de estos efectos sobre las ventas está cuantificado; el +15 % se refiere a la capacidad de atención.
+El catálogo a la vista también puede sumar: algunos clientes eligen productos especiales que no habrían pedido en la barra. Tampoco está cuantificado.
 
 **Aclaraciones**:
 - El resultado depende del tamaño del evento y de cuánta gente adopte la aplicación.
@@ -224,7 +224,7 @@ Además, el catálogo a la vista puede sumar un tercer efecto: clientes que elig
 - El sistema no controla la edad de quien retira: se asume que el control se hace en el ingreso al evento.
 - [Agregar las que surjan de las pruebas en celulares y con conectividad degradada.]
 
-**Evolución futura**: medir el impacto en un evento real (clientes atendidos por hora con y sin el sistema) para validar la estimación, Panel del Organizador con ABM, invitaciones de staff, Mercado Pago, métricas de venta en tiempo real, límite de intentos y QR rotativo para mitigar capturas.
+**Evolución futura**: medir el impacto en un evento real (clientes atendidos por hora, y personas que abandonan la fila, con y sin el sistema) para validar la estimación, Panel del Organizador con ABM, invitaciones de staff, Mercado Pago, métricas de venta en tiempo real, límite de intentos y QR rotativo para mitigar capturas.
 
 **Aprendizajes**: [Completar por el equipo.]
 
