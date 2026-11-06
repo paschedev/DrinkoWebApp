@@ -178,20 +178,36 @@ Las pruebas corren contra una base PostgreSQL real, no contra simulaciones, porq
 
 **Qué cambia respecto de la situación inicial**: el pedido y el cobro salen de la barra. La barra recibe tickets ya pagados y sabe de antemano qué tiene pendiente de entregar. Para el organizador, eso significa más ventas por hora. Para el público, significa esperar menos, comprar sin moverse de su lugar y ver todo lo que hay disponible, incluidos productos que en la barra quizás no habría pedido.
 
-**Impacto estimado (no medido)**: los tiempos dependen del tamaño del evento y de la cantidad de gente, así que no los usamos. En cambio, estimamos la mejora en porcentaje con un modelo simple, a partir de lo que surgió en la entrevista:
+### Estimación de impacto
 
-- `v`: parte del tiempo de atención en la barra que se va en vender (consultar, decidir, cobrar, dar el vuelto). Según la entrevista es la mayor parte; tomamos entre 50% y 60%.
-- `a`: parte del público que compra desde el celular en lugar de hacerlo en la caja o en la barra. Tomamos entre 30% y 50%.
-- Con la aplicación, a un cliente que ya pagó desde el celular la barra solo le entrega. El tiempo promedio de atención pasa a ser `1 - a·v` del original, y la capacidad de atención crece en `1 / (1 - a·v) - 1`.
+> Estimación teórica, **no medida**. El equipo debe validarla en un evento real.
 
-| Adopción (`a`) | Venta = 50% del tiempo | Venta = 60% del tiempo |
+Los tiempos dependen del tamaño del evento y de la cantidad de gente, así que no estimamos tiempos sino un porcentaje de mejora, con un modelo simple:
+
+- `s`: fracción del tiempo de atención en la barra que se va en vender (consultar, decidir, cobrar, dar el vuelto).
+- `a`: proporción de las compras que se hacen desde la aplicación.
+
+A un cliente que ya pagó desde el celular, la barra solo le entrega. Por eso el tiempo promedio por cliente pasa a ser `1 − a·s` del original, y la capacidad de atención en hora pico crece:
+
+```
+mejora = 1 / (1 − a·s) − 1
+```
+
+**Supuestos** (no medidos):
+- `s` entre 0,5 y 0,6, porque la entrevista identifica a la venta como el mayor cuello de botella.
+- `a` entre 0,3 y 0,4, porque parte del público sigue usando la caja.
+
+| | `s` = 0,5 | `s` = 0,6 |
 |---|---|---|
-| 30% | +18% | +22% |
-| 50% | +33% | +43% |
+| `a` = 0,3 | +18 % | +22 % |
+| `a` = 0,4 | +25 % | +32 % |
 
-Con estos supuestos, la capacidad de atención de la barra en hora pico crecería entre un 18% y un 43%. Para ser prudentes, documentamos como estimación **una mejora de alrededor del 15% al 35% en los pedidos atendidos por hora en hora pico**.
+El modelo da entre un 18 % y un 32 % más de clientes atendidos por hora en hora pico. El valor que documentamos, conservador, es **alrededor de +15 %**.
 
-Esta mejora se traduce en más ventas solo cuando la barra es el límite, es decir, en los momentos en que hay más gente queriendo comprar que la que la barra puede atender. Al estimado hay que sumarle un efecto que no cuantificamos: con el catálogo a la vista, algunos clientes eligen productos que no habrían pedido en la barra. Es una hipótesis, no un resultado; habría que validarla midiendo un evento real con y sin el sistema.
+**Aclaraciones**:
+- Es capacidad de atención, no ventas. Se traduce en más ventas solo cuando la fila hace que la gente desista de comprar.
+- El efecto de descubrir productos en el catálogo puede sumar, pero no lo cuantificamos.
+- El resultado depende del tamaño del evento y de cuánta gente adopte la aplicación.
 
 **Limitaciones conocidas**:
 - El pago es simulado; no hay integración con una pasarela real.
@@ -200,10 +216,11 @@ Esta mejora se traduce en más ventas solo cuando la barra es el límite, es dec
 - El cliente ve sus tickets solo desde el navegador donde compró, porque la cookie queda en ese navegador.
 - No hay límite de intentos de login.
 - La validación del problema es cualitativa: se basa en una entrevista y no incluye mediciones de tiempos de cobro ni de preparación.
+- El impacto en la capacidad de la barra no fue medido; la cifra de la sección anterior es una estimación teórica.
 - El sistema no controla la edad de quien retira: se asume que el control se hace en el ingreso al evento.
 - [Agregar las que surjan de las pruebas en celulares y con conectividad degradada.]
 
-**Evolución futura**: Panel del Organizador con ABM, invitaciones de staff, Mercado Pago, métricas de venta en tiempo real, límite de intentos y QR rotativo para mitigar capturas.
+**Evolución futura**: medir el impacto en un evento real (clientes atendidos por hora con y sin el sistema) para validar la estimación, Panel del Organizador con ABM, invitaciones de staff, Mercado Pago, métricas de venta en tiempo real, límite de intentos y QR rotativo para mitigar capturas.
 
 **Aprendizajes**: [Completar por el equipo.]
 
