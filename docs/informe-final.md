@@ -26,7 +26,7 @@ En las barras de eventos masivos y discotecas, comprar una bebida implica hacer 
 
 **Hipótesis central**: la demora principal está en *pedir y cobrar*, no en *preparar*. Servir una bebida lleva poco tiempo; lo que frena la fila es escuchar el pedido, cobrar y esperar la aprobación del pago.
 
-**Evidencia**: entrevistamos a un productor de eventos [nombre y fecha de la entrevista]. Según su experiencia, por varios factores, el mayor cuello de botella al servir bebidas en fiestas, festivales y eventos está en la venta: el cliente consulta qué hay disponible, decide, paga y espera el vuelto. Preparar y entregar la bebida lleva mucho menos tiempo.
+**Evidencia**: entrevistamos a un productor de eventos, conocido del equipo. Según su experiencia, por varios factores, el mayor cuello de botella al servir bebidas en fiestas, festivales y eventos está en la venta: el cliente consulta qué hay disponible, decide, paga y espera el vuelto. Preparar y entregar la bebida lleva mucho menos tiempo.
 
 La entrevista también mostró un efecto sobre la venta. En la barra, el cliente suele pedir rápido algo de consumo común que ya tenía en mente. Si hubiera visto el catálogo completo, quizás habría elegido un producto especial que no imaginaba que estuviera disponible.
 
@@ -78,7 +78,7 @@ erDiagram
 - Pedido, tickets e ítems se crean juntos en estado pendiente. Al aprobarse el pago, los tickets se activan con un número visible y un token aleatorio de 128 bits, que es el contenido del QR de retiro.
 - Ticket al portador: lo retira quien muestre el QR, completo y de una sola vez. Se puede canjear hasta 1 hora después del fin del evento.
 - Cada ítem guarda el nombre y el precio del producto al momento de la compra: un cambio de precio posterior no altera lo ya vendido.
-- [A definir por el equipo: control de edad para bebidas alcohólicas. Por ejemplo, si se asume controlado en el ingreso al evento, o si el staff puede negar la entrega al retirar.]
+- Control de edad para bebidas alcohólicas: se asume que lo hace el evento en el ingreso. La compra es anónima y el ticket es al portador, así que pagar no autoriza por sí solo la entrega. El sistema no verifica identidades.
 
 **Decisiones de modelado importantes**:
 - Separación entre catálogo maestro (`products`) y oferta del evento (`event_products`).
@@ -184,6 +184,8 @@ Las pruebas corren contra una base PostgreSQL real, no contra simulaciones, porq
 - El ticket es al portador: quien tenga una captura del QR puede retirarlo. Se mitiga mostrando al staff el número y el contenido al canjear.
 - El cliente ve sus tickets solo desde el navegador donde compró, porque la cookie queda en ese navegador.
 - No hay límite de intentos de login.
+- La validación del problema es cualitativa: se basa en una entrevista y no incluye mediciones de tiempos de cobro ni de preparación.
+- El sistema no controla la edad de quien retira: se asume que el control se hace en el ingreso al evento.
 - [Agregar las que surjan de las pruebas en celulares y con conectividad degradada.]
 
 **Evolución futura**: Panel del Organizador con ABM, invitaciones de staff, Mercado Pago, métricas de venta en tiempo real, límite de intentos y QR rotativo para mitigar capturas.
