@@ -9,6 +9,24 @@ import { formatPrice } from '@/lib/format';
 import { newUuid } from '@/lib/uuid';
 import type { Order } from '@/types/api';
 
+const ATTEMPTS = 3;
+const RETRY_DELAY_MS = 1500;
+
+// Reintenta solo si no hubo respuesta o el servidor falló. Usa siempre la misma
+// clave de idempotencia: si el primer intento llegó, el backend devuelve ese
+// mismo pedido en vez de crear otro.
+async function createOrderWithRetry(code: string, body: unknown) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await api<Order>(`/events/${code}/orders`, { method: 'POST', body });
+    } catch (e) {
+      const retryable = e instanceof ApiError && (e.isNetworkError || e.status >= 500);
+      if (!retryable || attempt === ATTEMPTS) throw e;
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+    }
+  }
+}
+
 export default function CartPage() {
   const { code } = useParams<{ code: string }>();
   const router = useRouter();
@@ -37,7 +55,7 @@ export default function CartPage() {
         items: ticket.items.map(({ eventProductId, quantity }) => ({ eventProductId, quantity })),
       }));
     try {
-      const order = await api<Order>(`/events/${code}/orders`, { method: 'POST', body: { idempotencyKey, tickets } });
+      const order = await createOrderWithRetry(code, { idempotencyKey, tickets });
       router.push(`/e/${code}/payment/${order.id}`);
     } catch (e) {
       if (e instanceof ApiError && e.status === 409) {

@@ -47,7 +47,13 @@ export default function PaymentPage() {
       setOrder(result);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'No se pudo procesar el pago');
+      // Si la respuesta se perdió, el pago pudo haberse hecho igual: se consulta el pedido.
       const updated = await api<Order>(`/orders/${orderId}`).catch(() => null);
+      if (updated?.status === 'PAID') {
+        cart.clear();
+        router.push('/tickets');
+        return;
+      }
       if (updated) setOrder(updated);
     }
     setSending(false);

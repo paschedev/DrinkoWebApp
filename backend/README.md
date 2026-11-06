@@ -84,7 +84,7 @@ npm test
 Corren contra una base PostgreSQL real (`drinko_test` en el Docker local, o la de `TEST_DATABASE_URL`), porque las garantías de concurrencia las da la base y no se pueden probar con mocks. Antes de empezar se aplican las migraciones en esa base.
 
 - `test/integration/checkout.spec.ts`: reserva de todo el pedido o nada, el mismo producto en varios tickets, productos no disponibles, vencimiento de la reserva, pago aprobado y rechazado, aprobación tardía, doble cobro.
-- `test/concurrency/checkout.concurrency.spec.ts`: 30 compras simultáneas con stock 10 (se concretan exactamente 10) y pagos simultáneos sin números de ticket repetidos.
+- `test/concurrency/checkout.concurrency.spec.ts`: 30 compras simultáneas con stock 10 (se concretan exactamente 10), reintentos simultáneos del mismo pedido (se crea uno solo) y pagos simultáneos sin números de ticket repetidos.
 - `test/integration/purchase-http.spec.ts`: el recorrido completo por HTTP, con la cookie del cliente.
 - `test/integration/redeem.spec.ts`: canje OK, ticket ya retirado, vencido, de otro evento, sin pagar y staff no asignado.
 - `test/concurrency/redeem.concurrency.spec.ts`: 50 escaneos simultáneos del mismo QR desde 5 staff: exactamente 1 canje.

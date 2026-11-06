@@ -46,6 +46,26 @@ describe('Concurrencia en la compra', () => {
     expect(await prisma.order.count()).toBe(10);
   });
 
+  it('reintentos simultáneos con la misma clave crean un solo pedido', async () => {
+    const { event, offers } = await createEventFixture(prisma, [
+      { name: 'Cerveza', priceCents: 5000, stock: 10 },
+    ]);
+    const customer = await createCustomer(prisma);
+    const input = {
+      idempotencyKey: randomUUID(),
+      tickets: [{ items: [{ eventProductId: offers.Cerveza, quantity: 2 }] }],
+    };
+
+    // Con mala señal, el celular reenvía el pedido mientras el primero sigue en curso.
+    const results = await Promise.all(
+      Array.from({ length: 5 }, () => orders.createOrder(event.accessCode, customer.id, input)),
+    );
+
+    expect(new Set(results.map((r) => r.id)).size).toBe(1);
+    expect(await prisma.order.count()).toBe(1);
+    expect(await getStock(prisma, offers.Cerveza)).toBe(8);
+  });
+
   it('pagos simultáneos no repiten números de ticket', async () => {
     const { event, offers } = await createEventFixture(prisma, [
       { name: 'Cerveza', priceCents: 5000, stock: null },
