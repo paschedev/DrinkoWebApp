@@ -202,7 +202,7 @@ mejora = 1 / (1 − a·s) − 1
 | `a` = 0,3 | +18 % | +22 % |
 | `a` = 0,4 | +25 % | +32 % |
 
-El modelo da entre un 18 % y un 32 % más de clientes atendidos por hora en hora pico. El valor que documentamos, conservador, es **alrededor de +15 %**. En un escenario favorable (mucha adopción de la aplicación y una barra donde la venta ocupa la mayor parte del tiempo), la mejora podría acercarse al **30 %**. Lo mencionamos como techo posible del modelo, no como resultado esperado.
+El modelo da entre un 18 % y un 32 % más de clientes atendidos por hora en hora pico. El valor que documentamos, conservador, es **alrededor de +15 %**. En un escenario favorable (mucha adopción de la aplicación y una barra donde la venta ocupa la mayor parte del tiempo: `s` = 0,6 y `a` = 0,4, con los que el modelo da +32 %), la mejora podría acercarse al **30 %**. Lo mencionamos como techo posible del modelo, no como resultado esperado.
 
 **Cómo se traduce en ventas**: hay dos factores, y los dos cuentan.
 1. **Más ventas por hora a lo largo de todo el evento**: la barra atiende más rápido, así que en la misma duración del evento se concretan más ventas. Es lo que estima el modelo: alrededor de +15 %.
