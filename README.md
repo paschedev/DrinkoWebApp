@@ -1,4 +1,4 @@
-**Trabajo Final Integrador - Tecnicatura Universitaria en Programación**
+**Trabajo Final Integrador - Tecnicatura Universitaria en Programación - Universidad Tecnológica Nacional**
 
 # Sistema ágil de compra en barras de eventos
 

@@ -4,7 +4,7 @@
 
 ## Portada
 
-- **Universidad y carrera**: [Universidad] · Tecnicatura Universitaria en Programación
+- **Universidad y carrera**: Universidad Tecnológica Nacional · Tecnicatura Universitaria en Programación
 - **Materia**: Proyecto Final
 - **Proyecto**: DrinkoWebApp · Sistema ágil de compra en barras de eventos
 - **Grupo**: G206
@@ -26,9 +26,13 @@ En las barras de eventos masivos y discotecas, comprar una bebida implica hacer 
 
 **Hipótesis central**: la demora principal está en *pedir y cobrar*, no en *preparar*. Servir una bebida lleva poco tiempo; lo que frena la fila es escuchar el pedido, cobrar y esperar la aprobación del pago.
 
-**Evidencia**: [Completar con la entrevista a personas con experiencia en barras: quién, fecha, cuántos puestos de barra, tiempos de cobro y de preparación en hora pico, cómo se repone. El tutor pidió esta validación en la Devolución 2.]
+**Evidencia**: entrevistamos a un productor de eventos [nombre y fecha de la entrevista]. Según su experiencia, por varios factores, el mayor cuello de botella al servir bebidas en fiestas, festivales y eventos está en la venta: el cliente consulta qué hay disponible, decide, paga y espera el vuelto. Preparar y entregar la bebida lleva mucho menos tiempo.
 
-**Necesidad**: sacar el pedido y el pago de la barra y pasarlos al celular del asistente, de modo que en la barra quede una sola fila de retiro, donde el pedido llega ya pagado.
+La entrevista también mostró un efecto sobre la venta. En la barra, el cliente suele pedir rápido algo de consumo común que ya tenía en mente. Si hubiera visto el catálogo completo, quizás habría elegido un producto especial que no imaginaba que estuviera disponible.
+
+**Necesidad**: sacar el pedido y el pago de la barra y pasarlos al celular del asistente, de modo que en la barra quede una sola fila de retiro, donde el pedido llega ya pagado. El asistente compra desde la pista, la mesa o su asiento, ve todos los productos con sus precios y retira cuando quiere.
+
+El sistema no reemplaza por completo a la venta tradicional: el evento puede mantener una caja para efectivo u otros medios de pago. La diferencia es que la demanda se reparte entre la caja y los celulares, en lugar de concentrarse en la barra.
 
 ## 2. Objetivos y alcance
 
@@ -172,7 +176,7 @@ Las pruebas corren contra una base PostgreSQL real, no contra simulaciones, porq
 
 **Qué se logró**: el recorrido completo de compra y retiro funciona de punta a punta. Las garantías más importantes (no vender de más, no canjear dos veces, no cobrar dos veces) están demostradas con pruebas de concurrencia, no solo afirmadas.
 
-**Qué cambia respecto de la situación inicial**: el pedido y el cobro salen de la barra. La barra recibe tickets ya pagados y sabe de antemano qué tiene pendiente de entregar.
+**Qué cambia respecto de la situación inicial**: el pedido y el cobro salen de la barra. La barra recibe tickets ya pagados y sabe de antemano qué tiene pendiente de entregar. Para el organizador, eso significa más ventas por hora. Para el público, significa esperar menos, comprar sin moverse de su lugar y ver todo lo que hay disponible, incluidos productos que en la barra quizás no habría pedido.
 
 **Limitaciones conocidas**:
 - El pago es simulado; no hay integración con una pasarela real.
