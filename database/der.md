@@ -176,7 +176,7 @@ Además de los índices de las claves primarias y de las restricciones `UNIQUE`:
 | `event_products (event_id, product_id)` único | Catálogo del evento, sin productos repetidos |
 | `orders (customer_id, created_at DESC)` | Mis tickets |
 | `orders (expires_at)` parcial, solo pendientes | Liberar las reservas vencidas |
-| `orders (customer_id)` único parcial, solo pendientes | Un solo pedido pendiente por cliente |
+| `orders (customer_id, event_id)` único parcial, solo pendientes | Un solo pedido pendiente por cliente en cada evento |
 | `payments (order_id)` único parcial, solo aprobados | Un solo pago aprobado por pedido |
 | `tickets (order_id)` | Tickets de cada compra |
 | `tickets (token)` único | Canje |
