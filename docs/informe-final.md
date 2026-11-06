@@ -204,9 +204,13 @@ mejora = 1 / (1 − a·s) − 1
 
 El modelo da entre un 18 % y un 32 % más de clientes atendidos por hora en hora pico. El valor que documentamos, conservador, es **alrededor de +15 %**.
 
+**Cómo se traduce en ventas**: la estimación mide capacidad de atención, y esa capacidad aumenta las ventas por dos vías que se suman:
+1. **Más ventas por hora a lo largo del evento**: la barra atiende a más clientes en el mismo tiempo, así que en toda la duración del evento se concretan más ventas.
+2. **Menos gente que desiste**: con filas más cortas y la opción de comprar desde el celular, menos personas abandonan la compra al ver la fila llena.
+
+Además, el catálogo a la vista puede sumar un tercer efecto: clientes que eligen productos que no habrían pedido en la barra. Ninguno de estos efectos sobre las ventas está cuantificado; el +15 % se refiere a la capacidad de atención.
+
 **Aclaraciones**:
-- Es capacidad de atención, no ventas. Se traduce en más ventas solo cuando la fila hace que la gente desista de comprar.
-- El efecto de descubrir productos en el catálogo puede sumar, pero no lo cuantificamos.
 - El resultado depende del tamaño del evento y de cuánta gente adopte la aplicación.
 
 **Limitaciones conocidas**:
