@@ -174,6 +174,42 @@ describe('API de staff', () => {
       expect(await getStock(prisma, offers.Cerveza)).toBe(6);
     });
 
+    it('no se puede editar desde un evento un producto de otro evento', async () => {
+      const { event, staff } = await scenario();
+      const other = await createEventFixture(prisma, [{ name: 'Agua', priceCents: 2000, stock: null }]);
+      const cookie = (await login(staff.email)).headers['set-cookie'];
+
+      // El staff opera su evento, pero el producto pertenece a otra productora.
+      await request(app.getHttpServer())
+        .patch(`/api/staff/events/${event.id}/products/${other.offers.Agua}`)
+        .set('Cookie', cookie)
+        .send({ priceCents: 1 })
+        .expect(404);
+      const offer = await prisma.eventProduct.findUniqueOrThrow({ where: { id: other.offers.Agua } });
+      expect(offer.priceCents).toBe(2000);
+    });
+
+    it('un organizador de otra productora recibe 403 en los eventos ajenos', async () => {
+      const { event } = await scenario();
+      const otherOrg = await prisma.organization.create({ data: { name: 'Otra Productora' } });
+      const outsider = await prisma.user.create({
+        data: {
+          organizationId: otherOrg.id,
+          email: 'otro-organizador@drinko.test',
+          name: 'Otro',
+          role: 'ORGANIZER',
+          passwordHash: await argon2.hash(PASSWORD),
+        },
+      });
+      const cookie = (await login(outsider.email)).headers['set-cookie'];
+      const server = app.getHttpServer();
+
+      await request(server).get(`/api/staff/events/${event.id}/products`).set('Cookie', cookie).expect(403);
+      await request(server).get(`/api/staff/events/${event.id}/demand`).set('Cookie', cookie).expect(403);
+      const events = await request(server).get('/api/staff/events').set('Cookie', cookie).expect(200);
+      expect(events.body).toEqual([]);
+    });
+
     it('un staff no asignado recibe 403 y no cambia nada', async () => {
       const { org, event, offers } = await scenario();
       const other = await createStaff(prisma, org.id);

@@ -95,6 +95,24 @@ describe('Compra: reserva de stock, vencimiento y pago simulado', () => {
       expect(await prisma.order.count()).toBe(0);
     });
 
+    it('rechaza productos de otro evento (por ejemplo, de otra productora)', async () => {
+      const { event, offers } = await createEventFixture(prisma, [
+        { name: 'Cerveza', priceCents: 5000, stock: 10 },
+      ]);
+      const other = await createEventFixture(prisma, [{ name: 'Agua', priceCents: 2000, stock: 5 }]);
+      const customer = await createCustomer(prisma);
+
+      await expect(
+        orders.createOrder(
+          event.accessCode,
+          customer.id,
+          order([item(offers.Cerveza, 1), item(other.offers.Agua, 1)]),
+        ),
+      ).rejects.toThrow(/no son de este evento/i);
+      expect(await getStock(prisma, offers.Cerveza)).toBe(10);
+      expect(await getStock(prisma, other.offers.Agua)).toBe(5);
+    });
+
     it('rechaza productos no disponibles', async () => {
       const { event, offers } = await createEventFixture(prisma, [
         { name: 'Mojito', priceCents: 7000, stock: null, isAvailable: false },

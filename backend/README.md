@@ -89,6 +89,7 @@ Corren contra una base PostgreSQL real (`drinko_test` en el Docker local, o la d
 - `test/integration/redeem.spec.ts`: canje OK, ticket ya retirado, vencido, de otro evento, sin pagar y staff no asignado.
 - `test/concurrency/redeem.concurrency.spec.ts`: 50 escaneos simultáneos del mismo QR desde 5 staff: exactamente 1 canje.
 - `test/integration/staff-http.spec.ts`: login, logout, eventos asignados, canje por HTTP, demanda pendiente y cambios de precio, stock y disponibilidad con su registro.
+- Recursos de productoras distintas: un pedido no puede incluir productos de otro evento, un organizador no opera eventos de otra productora y un producto no se edita desde un evento que no es el suyo.
 
 La migración inicial (`prisma/migrations/`) es equivalente a `database/ddl.sql`. Los CHECK, los índices parciales y las vistas no se pueden declarar en `schema.prisma`, por eso están escritos a mano al final de esa migración.
 

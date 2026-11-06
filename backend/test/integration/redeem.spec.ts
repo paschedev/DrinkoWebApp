@@ -157,6 +157,20 @@ describe('Canje de tickets en la barra', () => {
     expect(result.number).toBe(1);
   });
 
+  it('un organizador de otra productora no puede canjear', async () => {
+    const { event, ticket } = await paidTicketScenario();
+    const otherOrg = await prisma.organization.create({ data: { name: 'Otra Productora' } });
+    const outsider = await prisma.user.create({
+      data: { organizationId: otherOrg.id, email: 'otro@drinko.test', name: 'Otro', role: UserRole.ORGANIZER },
+    });
+
+    await expect(tickets.redeem(event.id, ticket.token!, asAuthUser(outsider))).rejects.toThrow(
+      /no estás asignado/i,
+    );
+    const saved = await prisma.ticket.findUniqueOrThrow({ where: { id: ticket.id } });
+    expect(saved.status).toBe(TicketStatus.ACTIVE);
+  });
+
   it('en la vista del cliente, el ticket retirado ya no muestra el QR', async () => {
     const { event, ticket, staff } = await paidTicketScenario({ endsAt: minutesFromNow(120) });
     await tickets.redeem(event.id, ticket.token!, staff);
