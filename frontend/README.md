@@ -1,6 +1,6 @@
 # Frontend · Next.js + TypeScript
 
-Una sola aplicación con las tres interfaces del sistema. Cada área es un grupo de rutas; el nombre entre paréntesis no forma parte de la URL. En esta entrega la carpeta tiene solo la estructura.
+Una sola aplicación con las tres interfaces del sistema. Cada área es un grupo de rutas; el nombre entre paréntesis no forma parte de la URL.
 
 ```
 frontend/
@@ -16,3 +16,29 @@ frontend/
     ├── lib/                cliente de la API y utilidades
     └── types/
 ```
+
+## Cómo correrlo
+
+Con el backend levantado, dentro de `frontend/`:
+
+```bash
+cp .env.example .env.local
+npm install
+npm run dev     # http://localhost:3000
+```
+
+Las llamadas a `/api/...` las reenvía Next.js al backend indicado en `BACKEND_URL` (ver `next.config.ts`), así el navegador habla siempre con el mismo dominio.
+
+## Recorrido de compra
+
+| Ruta | Pantalla |
+| :--- | :--- |
+| `/e/[code]` | Catálogo del evento (se abre con el QR de acceso) |
+| `/e/[code]/cart` | Carrito dividido en tickets |
+| `/e/[code]/payment/[orderId]` | Pago simulado, con el tiempo de reserva |
+| `/tickets` | Mis tickets, con el QR de retiro |
+| `/t/[token]` | Un ticket suelto |
+
+El carrito se guarda en el navegador (`localStorage`). El cliente se identifica con una cookie httpOnly que crea el backend.
+
+El despliegue en Vercel está explicado en [docs/deploy.md](../docs/deploy.md).
