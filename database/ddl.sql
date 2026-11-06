@@ -133,8 +133,8 @@ CREATE TABLE orders (
 
 CREATE INDEX orders_customer_created_at_idx ON orders (customer_id, created_at DESC);
 CREATE INDEX orders_pending_expires_at_idx ON orders (expires_at) WHERE status = 'PENDING_PAYMENT';
--- Un cliente no puede tener dos pedidos pendientes a la vez.
-CREATE UNIQUE INDEX orders_one_pending_per_customer_uk ON orders (customer_id) WHERE status = 'PENDING_PAYMENT';
+-- Un cliente no puede tener dos pedidos pendientes en el mismo evento.
+CREATE UNIQUE INDEX orders_one_pending_per_customer_event_uk ON orders (customer_id, event_id) WHERE status = 'PENDING_PAYMENT';
 
 CREATE TABLE payments (
     id                  uuid           PRIMARY KEY DEFAULT gen_random_uuid(),

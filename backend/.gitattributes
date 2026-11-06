@@ -1,0 +1,2 @@
+# Prisma valida las migraciones con un checksum: tienen que quedar iguales en Windows y en Linux.
+prisma/migrations/** text eol=lf

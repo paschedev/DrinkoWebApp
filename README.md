@@ -1,10 +1,16 @@
-**Trabajo Final Integrador - Tecnicatura Universitaria en Programación**
+**Trabajo Final Integrador - Tecnicatura Universitaria en Programación - Universidad Tecnológica Nacional**
 
 # Sistema ágil de compra en barras de eventos
 
-* **Equipo de Trabajo**: Javier Isaias Ovelar y Gastón Paschetta
+* **Equipo de Trabajo**: Javier Isaias Ovelar y Gastón Paschetta (Grupo G206)
 * **Tutor Asignado**: Oscar Londero.
 * **Repositorio Oficial**: https://github.com/paschedev/DrinkoWebApp
+
+### Entrega final
+* **Sistema desplegado**: _pendiente de publicar_ (QR de acceso de la demo: `/e/k7f3q9mx`)
+* **Informe Final (PDF)**: _pendiente_ (borrador en [docs/informe-final.md](docs/informe-final.md))
+* **Video de presentación**: _pendiente_
+* **Cuentas de demostración**: usuarios ficticios `@drinko.test`, detallados en [backend/README.md](backend/README.md#usuarios-de-prueba).
 
 ## 1. Definición del Problema
 * La experiencia de compra de bebidas en barras de eventos masivos y discotecas presenta un alto nivel de fricción.
@@ -62,16 +68,18 @@
 ```
 /
 ├── README.md
-├── backend/          API REST en NestJS (solo carpetas en esta entrega)
-├── frontend/         App Next.js con las áreas cliente, barra y panel (solo carpetas en esta entrega)
+├── docker-compose.yml  PostgreSQL local para desarrollo
+├── backend/            API REST en NestJS + Prisma, con sus tests
+├── frontend/           App Next.js con las áreas cliente y barra
 ├── database/
-│   ├── der.md        diagrama entidad-relación
-│   ├── ddl.sql       creación de tablas, claves e índices
-│   └── dml-seed.sql  datos de ejemplo
+│   ├── der.md          diagrama entidad-relación
+│   ├── ddl.sql         creación de tablas, claves e índices
+│   └── dml-seed.sql    datos de ejemplo
 └── docs/
     ├── arquitectura.md
     ├── modulos.md
-    └── informes/     informes de avance
+    ├── deploy.md       despliegue en Railway y Vercel
+    └── informes/       informes de avance
 ```
 
 Los nombres de tablas, columnas, variables y archivos de código están en inglés; la documentación, en español.
@@ -79,3 +87,29 @@ Los nombres de tablas, columnas, variables y archivos de código están en ingl�
 ## 7. Control de Versiones y Auditoría
 * Todo el código fuente del proyecto se gestionará utilizando Git. 
 * El repositorio de GitHub actuará como fuente oficial para la auditoría del trabajo colaborativo, la revisión de ramas y el seguimiento constante de commits por parte de la cátedra y el tutor.
+* Ramas: `main` tiene la versión entregable y `dev` el desarrollo en curso. Los cambios pasan de `dev` a `main` con un pull request.
+
+## 8. Estado de la Implementación
+Implementado y probado:
+* **Cliente**: QR de acceso al evento, catálogo, carrito dividido en tickets, reserva de stock, pago simulado (aprobado o rechazado), mis tickets con su QR de retiro.
+* **Barra**: login de organizadores y staff, escáner de QR con canje atómico, panel de precio, stock y disponibilidad, y demanda pendiente.
+* **Reglas críticas** cubiertas por tests contra PostgreSQL: reserva de todo el pedido o nada, última unidad con compras simultáneas, vencimiento de la reserva, aprobación tardía, numeración de tickets, doble escaneo simultáneo y separación entre productoras.
+
+Fuera de esta entrega:
+* **Panel del Organizador** (ABM del catálogo maestro, creación de eventos y asignación de staff): los datos se cargan con el seed.
+* **Integración con Mercado Pago**: el pago es simulado.
+* Invitaciones de staff por enlace y métricas de venta.
+
+## 9. Cómo Ejecutarlo
+Requiere Node.js 22 o superior y Docker (para la base de datos).
+
+```bash
+docker compose up -d
+cd backend && cp .env.example .env && npm install && npx prisma migrate dev && npx prisma db seed && npm run start:dev
+cd frontend && cp .env.example .env.local && npm install && npm run dev
+```
+
+* Cliente: `http://localhost:3000/e/k7f3q9mx` (evento de prueba del seed).
+* Barra: `http://localhost:3000/login`. Las cuentas de prueba están en [backend/README.md](backend/README.md).
+* Tests del backend: `cd backend && npm test`.
+* Despliegue y variables de entorno: [docs/deploy.md](docs/deploy.md).
