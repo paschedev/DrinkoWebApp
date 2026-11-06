@@ -178,6 +178,21 @@ Las pruebas corren contra una base PostgreSQL real, no contra simulaciones, porq
 
 **Qué cambia respecto de la situación inicial**: el pedido y el cobro salen de la barra. La barra recibe tickets ya pagados y sabe de antemano qué tiene pendiente de entregar. Para el organizador, eso significa más ventas por hora. Para el público, significa esperar menos, comprar sin moverse de su lugar y ver todo lo que hay disponible, incluidos productos que en la barra quizás no habría pedido.
 
+**Impacto estimado (no medido)**: los tiempos dependen del tamaño del evento y de la cantidad de gente, así que no los usamos. En cambio, estimamos la mejora en porcentaje con un modelo simple, a partir de lo que surgió en la entrevista:
+
+- `v`: parte del tiempo de atención en la barra que se va en vender (consultar, decidir, cobrar, dar el vuelto). Según la entrevista es la mayor parte; tomamos entre 50% y 60%.
+- `a`: parte del público que compra desde el celular en lugar de hacerlo en la caja o en la barra. Tomamos entre 30% y 50%.
+- Con la aplicación, a un cliente que ya pagó desde el celular la barra solo le entrega. El tiempo promedio de atención pasa a ser `1 - a·v` del original, y la capacidad de atención crece en `1 / (1 - a·v) - 1`.
+
+| Adopción (`a`) | Venta = 50% del tiempo | Venta = 60% del tiempo |
+|---|---|---|
+| 30% | +18% | +22% |
+| 50% | +33% | +43% |
+
+Con estos supuestos, la capacidad de atención de la barra en hora pico crecería entre un 18% y un 43%. Para ser prudentes, documentamos como estimación **una mejora de alrededor del 15% al 35% en los pedidos atendidos por hora en hora pico**.
+
+Esta mejora se traduce en más ventas solo cuando la barra es el límite, es decir, en los momentos en que hay más gente queriendo comprar que la que la barra puede atender. Al estimado hay que sumarle un efecto que no cuantificamos: con el catálogo a la vista, algunos clientes eligen productos que no habrían pedido en la barra. Es una hipótesis, no un resultado; habría que validarla midiendo un evento real con y sin el sistema.
+
 **Limitaciones conocidas**:
 - El pago es simulado; no hay integración con una pasarela real.
 - No hay pantallas de administración: productoras, catálogo, eventos y staff se cargan con el seed.
