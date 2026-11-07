@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CustomerHeader } from '@/components/customer/CustomerHeader';
 import { TicketCard } from '@/components/customer/TicketCard';
+import { Loading } from '@/components/ui/Loading';
 import { api, ApiError } from '@/lib/api';
 import { loadTickets } from '@/lib/ticketCache';
 import type { Ticket } from '@/types/api';
@@ -34,12 +35,22 @@ export default function TicketPage() {
       </main>
     );
   }
-  if (!ticket) return <main className="page"><CustomerHeader />Cargando...</main>;
+  if (!ticket) {
+    return (
+      <main className="page">
+        <CustomerHeader />
+        <Loading text="Cargando el ticket..." />
+      </main>
+    );
+  }
 
   return (
     <main className="page">
       <CustomerHeader eventCode={ticket.eventCode} />
       <TicketCard ticket={ticket} />
+      {ticket.status === 'ACTIVE' && (
+        <p className="muted center">El ticket es al portador: lo retira quien muestre este QR.</p>
+      )}
     </main>
   );
 }

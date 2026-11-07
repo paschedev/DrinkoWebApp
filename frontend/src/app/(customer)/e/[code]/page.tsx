@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CustomerHeader } from '@/components/customer/CustomerHeader';
+import { Loading } from '@/components/ui/Loading';
 import { MAX_PER_TICKET, useCart } from '@/hooks/useCart';
 import { api, ApiError } from '@/lib/api';
 import { formatPrice, formatTime } from '@/lib/format';
@@ -25,12 +26,20 @@ export default function CatalogPage() {
     return (
       <main className="page">
         <CustomerHeader />
-        <h1>Ups</h1>
-        <p>{error}</p>
+        <h1>No pudimos abrir el evento</h1>
+        <p>{error}.</p>
+        <p className="muted">Revisá que el QR sea el del evento o volvé a escanearlo.</p>
       </main>
     );
   }
-  if (!catalog) return <main className="page"><CustomerHeader eventCode={code} current="catalog" />Cargando...</main>;
+  if (!catalog) {
+    return (
+      <main className="page">
+        <CustomerHeader eventCode={code} current="catalog" />
+        <Loading text="Cargando el catálogo..." />
+      </main>
+    );
+  }
 
   if (catalog.status === 'SCHEDULED') {
     return (
@@ -60,11 +69,28 @@ export default function CatalogPage() {
     <main className="page with-bar">
       <CustomerHeader eventCode={code} current="catalog" />
       <h1>{catalog.name}</h1>
-      {cart.tickets.length > 1 && <p className="hint">Agregando al Ticket {cart.active + 1}</p>}
+      {cart.tickets.length > 1 && (
+        // Con varios tickets, se elige a cuál van los productos que se agregan.
+        <div className="ticket-picker">
+          <span className="muted">Agregando al</span>
+          <nav className="tabs">
+            {cart.tickets.map((_, index) => (
+              <button
+                key={index}
+                className={index === cart.active ? 'active' : undefined}
+                onClick={() => cart.setActive(index)}
+                aria-pressed={index === cart.active}
+              >
+                Ticket {index + 1}
+              </button>
+            ))}
+          </nav>
+        </div>
+      )}
 
       {catalog.categories.map((category) => (
         <section key={category.name}>
-          <h2>{category.name}</h2>
+          <h2 className="section-title">{category.name}</h2>
           <ul className="list">
             {category.products.map((product) => {
               const quantity = cart.quantityIn(cart.active, product.eventProductId);

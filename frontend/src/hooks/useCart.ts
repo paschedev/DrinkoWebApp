@@ -6,15 +6,45 @@ import { useEffect, useState } from 'react';
 // Se guarda en el navegador para no perderlo al cambiar de página.
 
 export const MAX_PER_TICKET = 10;
+export const CART_NOTICE_KEY = 'drinko-cart-notice';
 
 export type CartItem = { eventProductId: string; name: string; priceCents: number; quantity: number };
 export type CartTicket = { items: CartItem[] };
 type CartState = { tickets: CartTicket[]; active: number };
 
 const emptyCart = (): CartState => ({ tickets: [{ items: [] }], active: 0 });
+const storageKeyFor = (eventCode: string) => `drinko-cart-${eventCode}`;
+
+// Divide un ticket en dos mitades. Con cantidades impares, el primero se lleva la unidad extra.
+export function splitItems(items: CartItem[]): [CartItem[], CartItem[]] {
+  const first = items.map((item) => ({ ...item, quantity: Math.ceil(item.quantity / 2) }));
+  const second = items
+    .map((item) => ({ ...item, quantity: Math.floor(item.quantity / 2) }))
+    .filter((item) => item.quantity > 0);
+  return [first, second];
+}
+
+// Agrega un ticket al carrito guardado de un evento (lo usa "Repetir compra").
+export function addTicketToStoredCart(eventCode: string, items: CartItem[]) {
+  let cart = emptyCart();
+  try {
+    const saved = localStorage.getItem(storageKeyFor(eventCode));
+    if (saved) cart = JSON.parse(saved);
+  } catch {
+    // Carrito ilegible: se empieza de nuevo.
+  }
+  const tickets = cart.tickets.filter((ticket) => ticket.items.length > 0);
+  tickets.push({ items });
+  const next: CartState = { tickets, active: tickets.length - 1 };
+  try {
+    localStorage.setItem(storageKeyFor(eventCode), JSON.stringify(next));
+  } catch {
+    // Sin almacenamiento no se puede pasar el carrito a la otra pantalla.
+  }
+}
 
 export function useCart(eventCode: string) {
-  const storageKey = `drinko-cart-${eventCode}`;
+  const storageKey = storageKeyFor(eventCode);
   const [cart, setCart] = useState<CartState>(emptyCart);
   const [loaded, setLoaded] = useState(false);
 
@@ -70,6 +100,23 @@ export function useCart(eventCode: string) {
     });
   }
 
+  function duplicateTicket(index: number) {
+    setCart((prev) => {
+      const copy = { items: prev.tickets[index].items.map((item) => ({ ...item })) };
+      const tickets = [...prev.tickets.slice(0, index + 1), copy, ...prev.tickets.slice(index + 1)];
+      return { tickets, active: index + 1 };
+    });
+  }
+
+  function splitTicket(index: number) {
+    setCart((prev) => {
+      const [first, second] = splitItems(prev.tickets[index].items);
+      if (second.length === 0) return prev;
+      const tickets = [...prev.tickets.slice(0, index), { items: first }, { items: second }, ...prev.tickets.slice(index + 1)];
+      return { ...prev, tickets };
+    });
+  }
+
   function setActive(index: number) {
     setCart((prev) => ({ ...prev, active: index }));
   }
@@ -101,6 +148,8 @@ export function useCart(eventCode: string) {
     changeQuantity,
     addTicket,
     removeTicket,
+    duplicateTicket,
+    splitTicket,
     setActive,
     clear,
     totalFor,

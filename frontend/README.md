@@ -51,6 +51,14 @@ Las llamadas a `/api/...` las reenvía Next.js al backend indicado en `BACKEND_U
 
 La cámara del navegador solo funciona con HTTPS (o en `localhost`).
 
+## Detalles de uso
+
+- Tema claro, oscuro o el del sistema (selector al pie de cada pantalla, recordado en el navegador). Los pares de colores cumplen el contraste WCAG AA en los dos temas, y el QR se muestra siempre sobre fondo blanco.
+- Carrito: duplicar un ticket, dividirlo en dos (con cantidades impares, el primero se lleva la unidad extra) y confirmar antes de quitar uno.
+- Pago: se puede cancelar el pedido pendiente, lo que libera la reserva al instante.
+- Mis tickets: primero los que se pueden retirar y después el historial; "Repetir compra" copia los productos de un ticket al carrito con los precios actuales y avisa si alguno ya no está disponible.
+- Barra: el escáner vuelve solo a la cámara después de cada canje, y cada cambio de productos confirma que se guardó (el de precio pide confirmación antes).
+
 El carrito se guarda en el navegador (`localStorage`). Con mala señal, el pedido se reintenta con la misma clave de idempotencia (no se duplica), y "Mis tickets" muestra la última copia guardada para poder enseñar el QR sin conexión. El cliente se identifica con una cookie httpOnly que crea el backend.
 
 El despliegue en Vercel está explicado en [docs/deploy.md](../docs/deploy.md).

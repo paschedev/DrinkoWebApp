@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CustomerHeader } from '@/components/customer/CustomerHeader';
-import { MAX_PER_TICKET, useCart } from '@/hooks/useCart';
+import { Loading } from '@/components/ui/Loading';
+import { CART_NOTICE_KEY, MAX_PER_TICKET, useCart } from '@/hooks/useCart';
 import { api, ApiError } from '@/lib/api';
 import { formatPrice } from '@/lib/format';
 import { newUuid } from '@/lib/uuid';
@@ -42,10 +43,22 @@ export default function CartPage() {
     router.push(`/e/${code}`);
   }
 
-  function splitTicket() {
+  // Ticket nuevo y vacío: se vuelve al catálogo para llenarlo.
+  function newTicket() {
     cart.addTicket();
     router.push(`/e/${code}`);
   }
+
+  // Aviso que deja "Repetir compra" (por ejemplo, productos que ya no están disponibles).
+  const [notice, setNotice] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      setNotice(sessionStorage.getItem(CART_NOTICE_KEY));
+      sessionStorage.removeItem(CART_NOTICE_KEY);
+    } catch {
+      // Sin almacenamiento no hay aviso.
+    }
+  }, []);
 
   async function confirm() {
     setSending(true);
@@ -72,74 +85,111 @@ export default function CartPage() {
     }
   }
 
-  if (!cart.loaded) return <main className="page"><CustomerHeader eventCode={code} />Cargando...</main>;
+  if (!cart.loaded) {
+    return (
+      <main className="page">
+        <CustomerHeader eventCode={code} />
+        <Loading />
+      </main>
+    );
+  }
 
   if (cart.itemCount === 0) {
     return (
       <main className="page">
         <CustomerHeader eventCode={code} />
         <h1>Tu carrito está vacío</h1>
-        <Link href={`/e/${code}`}>Volver al catálogo</Link>
+        {notice && <p className="notice">{notice}</p>}
+        <Link href={`/e/${code}`} className="button-link">
+          Ver el catálogo
+        </Link>
       </main>
     );
+  }
+
+  function removeTicket(index: number) {
+    const ticket = cart.tickets[index];
+    if (ticket.items.length > 0 && !window.confirm(`¿Quitar el Ticket ${index + 1} con todos sus productos?`)) return;
+    cart.removeTicket(index);
   }
 
   return (
     <main className="page">
       <CustomerHeader eventCode={code} />
       <h1>Carrito</h1>
-      <p className="notice">
-        Cada ticket se retira completo y de una sola vez. Si querés retirar en momentos distintos, separá tu compra en
-        varios tickets.
+      {notice && <p className="notice">{notice}</p>}
+      <p className="hint">
+        Cada ticket se retira completo y de una sola vez. Para retirar en momentos distintos, dividí tu compra en varios
+        tickets.
       </p>
 
-      {cart.tickets.map((ticket, index) => (
-        <section key={index} className="card">
-          <div className="page-header">
-            <h2>Ticket {index + 1}</h2>
-            {cart.tickets.length > 1 && (
-              <button className="link-button" onClick={() => cart.removeTicket(index)}>
-                Quitar
+      {cart.tickets.map((ticket, index) => {
+        const units = ticket.items.reduce((sum, item) => sum + item.quantity, 0);
+        return (
+          <section key={index} className="card">
+            <div className="page-header">
+              <h2>Ticket {index + 1}</h2>
+              <span className="muted">{formatPrice(ticket.items.reduce((sum, i) => sum + i.priceCents * i.quantity, 0))}</span>
+            </div>
+            {ticket.items.length === 0 && <p className="muted">Todavía no tiene productos.</p>}
+            <ul className="list">
+              {ticket.items.map((item) => (
+                <li key={item.eventProductId} className="row">
+                  <div>
+                    <strong>{item.name}</strong>
+                    <div className="muted">{formatPrice(item.priceCents * item.quantity)}</div>
+                  </div>
+                  <div className="stepper">
+                    <button onClick={() => cart.changeQuantity(index, item, -1)} aria-label={`Quitar un ${item.name}`}>
+                      −
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      onClick={() => cart.changeQuantity(index, item, 1)}
+                      disabled={item.quantity >= MAX_PER_TICKET}
+                      aria-label={`Agregar un ${item.name}`}
+                    >
+                      +
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="card-actions">
+              <button className="link-button" onClick={() => addMoreTo(index)}>
+                Agregar productos
               </button>
-            )}
-          </div>
-          {ticket.items.length === 0 && <p className="muted">Sin productos</p>}
-          <ul className="list">
-            {ticket.items.map((item) => (
-              <li key={item.eventProductId} className="row">
-                <div>
-                  <strong>{item.name}</strong>
-                  <div className="muted">{formatPrice(item.priceCents * item.quantity)}</div>
-                </div>
-                <div className="stepper">
-                  <button onClick={() => cart.changeQuantity(index, item, -1)} aria-label="Quitar uno">
-                    −
-                  </button>
-                  <span>{item.quantity}</span>
-                  <button
-                    onClick={() => cart.changeQuantity(index, item, 1)}
-                    disabled={item.quantity >= MAX_PER_TICKET}
-                    aria-label="Agregar uno"
-                  >
-                    +
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <button className="link-button" onClick={() => addMoreTo(index)}>
-            Agregar productos a este ticket
-          </button>
-        </section>
-      ))}
+              {units > 0 && (
+                <button className="link-button" onClick={() => cart.duplicateTicket(index)}>
+                  Duplicar
+                </button>
+              )}
+              {units > 1 && (
+                <button className="link-button" onClick={() => cart.splitTicket(index)}>
+                  Dividir en dos
+                </button>
+              )}
+              {cart.tickets.length > 1 && (
+                <button className="link-button" onClick={() => removeTicket(index)}>
+                  Quitar ticket
+                </button>
+              )}
+            </div>
+          </section>
+        );
+      })}
 
-      <button className="secondary" onClick={splitTicket}>
-        Separar en otro ticket
+      <button className="secondary" onClick={newTicket}>
+        + Nuevo ticket vacío
       </button>
 
+      <div className="total">
+        <span>Total</span>
+        <span>{formatPrice(cart.totalCents)}</span>
+      </div>
       {error && <p className="error">{error}</p>}
       <button className="primary" onClick={confirm} disabled={sending}>
-        {sending ? 'Reservando...' : `Confirmar y pagar · ${formatPrice(cart.totalCents)}`}
+        {sending ? 'Reservando el stock...' : 'Confirmar y pagar'}
       </button>
     </main>
   );

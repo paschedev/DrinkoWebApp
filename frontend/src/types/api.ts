@@ -20,7 +20,7 @@ export type Catalog = {
   categories: { name: string; products: CatalogProduct[] }[];
 };
 
-export type TicketItem = { productName: string; unitPriceCents: number; quantity: number };
+export type TicketItem = { eventProductId?: string; productName: string; unitPriceCents: number; quantity: number };
 
 export type Order = {
   id: string;

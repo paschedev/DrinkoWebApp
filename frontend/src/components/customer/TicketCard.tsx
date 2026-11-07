@@ -9,7 +9,8 @@ const STATUS_LABEL: Record<Ticket['status'], string> = {
   EXPIRED: 'Vencido',
 };
 
-export function TicketCard({ ticket }: { ticket: Ticket }) {
+// `children`: acciones del ticket (compartir, repetir compra).
+export function TicketCard({ ticket, children }: { ticket: Ticket; children?: React.ReactNode }) {
   return (
     <section className="card">
       <div className="page-header">
@@ -28,13 +29,14 @@ export function TicketCard({ ticket }: { ticket: Ticket }) {
       {ticket.token && (
         <>
           <div className="qr">
-            <QRCodeSVG value={ticket.token} size={220} marginSize={2} />
+            <QRCodeSVG value={ticket.token} size={200} marginSize={1} />
           </div>
-          <p className="muted">Mostrá este QR en la barra.</p>
-          <p className="muted">Se puede retirar hasta el {formatTime(ticket.redeemableUntil)}</p>
+          <p className="muted center">Mostrá este QR en la barra. Se retira completo y de una sola vez.</p>
+          <p className="muted center">Se puede retirar hasta el {formatTime(ticket.redeemableUntil)}</p>
         </>
       )}
       {ticket.redeemedAt && <p className="muted">Retirado el {formatTime(ticket.redeemedAt)}</p>}
+      {children && <div className="card-actions">{children}</div>}
     </section>
   );
 }
