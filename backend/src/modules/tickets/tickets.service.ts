@@ -15,7 +15,7 @@ import { AuthUser } from '../auth/auth-user';
 import { EventAccessService } from '../auth/event-access.service';
 
 const ticketInclude = {
-  event: { select: { name: true, endsAt: true } },
+  event: { select: { name: true, endsAt: true, accessCode: true } },
   items: { orderBy: { productName: 'asc' } },
 } satisfies Prisma.TicketInclude;
 
@@ -30,6 +30,7 @@ function toTicketView(ticket: TicketWithDetails, now: Date) {
     // Un ticket retirado o vencido deja de mostrar su QR.
     token: status === 'ACTIVE' ? ticket.token : null,
     eventName: ticket.event.name,
+    eventCode: ticket.event.accessCode,
     redeemableUntil: getRedeemDeadline(ticket.event),
     redeemedAt: ticket.redeemedAt,
     createdAt: ticket.createdAt,

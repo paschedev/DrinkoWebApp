@@ -37,6 +37,7 @@ export type Ticket = {
   status: 'PENDING' | 'ACTIVE' | 'REDEEMED' | 'EXPIRED';
   token: string | null;
   eventName: string;
+  eventCode: string;
   redeemableUntil: string;
   redeemedAt: string | null;
   items: TicketItem[];
