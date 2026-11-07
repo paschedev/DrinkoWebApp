@@ -16,12 +16,12 @@ Navegador ──► Vercel (Next.js) ──/api──► Railway (NestJS) ──
 4. En **Variables** del servicio:
    - `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`. Es una referencia a la base del mismo proyecto, que usa la red interna.
    - `NODE_ENV` = `production`. Con esto la cookie del cliente se marca como `Secure`.
-   - `PORT` no hace falta: Railway la define sola.
-5. En **Settings → Networking**, generar un dominio público (Generate Domain).
+   - `PORT` = el mismo puerto que se elija al generar el dominio (por ejemplo `9090`). La app escucha en ese puerto; si no coinciden, Railway responde 502 "Application failed to respond".
+5. En **Settings → Networking**, generar un dominio público (Generate Domain) con ese puerto. En Railway cada servicio corre aislado, así que el puerto no choca con el de otras apps.
 
 Con `railway.json`, en cada despliegue Railway:
 
-- compila con `npm run build`;
+- compila con `npm install --include=dev && npm run build` (con `NODE_ENV=production`, npm omitiría las herramientas de compilación);
 - aplica las migraciones con `npx prisma migrate deploy` antes de arrancar;
 - arranca con `node dist/main.js`;
 - espera a que `/api/health` responda.
@@ -30,7 +30,16 @@ Para comprobarlo, abrir `https://<dominio-de-railway>/api/health`. Tiene que dev
 
 ## 2. Datos de ejemplo en la base de Railway
 
-El seed se corre una vez desde la computadora local, apuntando a la base de Railway. Usar la URL **pública** de la base: en Railway, servicio Postgres → Variables → `DATABASE_PUBLIC_URL`.
+El seed se corre **una sola vez**. Lo más simple es hacerlo desde la consola del servicio backend en Railway (pestaña Console), que ya tiene `DATABASE_URL` apuntando a la base:
+
+```bash
+npx prisma migrate deploy   # solo si las tablas no se crearon en el deploy
+npx prisma db seed
+```
+
+Tiene que terminar con "Seed cargado. Evento demo: /e/k7f3q9mx". Si `/api/health` responde pero el catálogo devuelve 500, las tablas no existen: correr `npx prisma migrate deploy` y revisar que el Config File Path sea `/backend/railway.json`.
+
+También se puede correr desde la computadora local, con la URL **pública** de la base (servicio Postgres → Variables → `DATABASE_PUBLIC_URL`).
 
 En PowerShell, dentro de `backend/`:
 
@@ -62,7 +71,7 @@ Para probarlo, abrir `https://<dominio-de-vercel>/e/k7f3q9mx` y recorrer la comp
 | Variable | Dónde | Para qué |
 | :--- | :--- | :--- |
 | `DATABASE_URL` | backend | Conexión a PostgreSQL |
-| `PORT` | backend | Puerto HTTP (Railway la define sola; en local es 3001) |
+| `PORT` | backend | Puerto HTTP. En Railway, el mismo del dominio (9090 en nuestro deploy); en local, 3001 |
 | `NODE_ENV` | backend | En `production`, la cookie del cliente sale con `Secure` |
 | `BACKEND_URL` | frontend | URL del backend al que Next.js reenvía `/api` |
 | `TEST_DATABASE_URL` | backend (opcional) | Base para los tests; por defecto `drinko_test` en el Docker local |

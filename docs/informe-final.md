@@ -13,6 +13,7 @@
 - **Año**: 2026
 - **Repositorio**: https://github.com/paschedev/DrinkoWebApp (versión entregada: tag `[v1.0.0]`)
 - **Sistema desplegado**: [link de Vercel]
+- **API**: https://drinkowebapp-production.up.railway.app
 - **Video**: [link del video]
 
 ## 1. Problema y contexto
