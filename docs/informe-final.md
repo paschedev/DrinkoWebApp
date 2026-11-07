@@ -141,11 +141,16 @@ Se eligió un monolito modular y no microservicios: para un equipo de dos person
 - *Numerar tickets sin repetir*: cada pago reserva un bloque de números con un único `UPDATE events SET last_ticket_number = last_ticket_number + n`, que bloquea la fila del evento.
 - *Liberar reservas vencidas una sola vez*: el proceso que corre cada 30 segundos solo cambia un pedido si sigue pendiente. Si corre dos veces, o a la vez que un pago, no devuelve el stock dos veces.
 - *Reglas que Prisma no puede declarar*: las restricciones `CHECK`, los índices parciales y las vistas se agregaron a mano en la migración inicial. Se verificó que la base resultante es igual a la de `database/ddl.sql`.
+- *Conectividad mala en el evento*:
+  - Si el pedido no recibe respuesta, el celular lo reintenta con la misma clave de idempotencia, y el backend devuelve el mismo pedido en lugar de crear otro.
+  - "Mis tickets" guarda una copia en el celular, así el QR se puede mostrar sin señal; el canje lo valida siempre el servidor.
+  - Si se pierde la respuesta del pago, la pantalla consulta el estado del pedido antes de mostrar un error.
+  - En la barra, si no hay respuesta, el escáner avisa que no se sabe si se canjeó. Volver a escanear lo aclara, porque un ticket ya canjeado responde "ya fue retirado".
 - [Agregar otras dificultades que encuentren en el deploy o con la cámara.]
 
 ## 6. Pruebas y validación
 
-Las pruebas corren contra una base PostgreSQL real, no contra simulaciones, porque las garantías de concurrencia las da la base. Se ejecutan con `npm test` en `backend/`. Resultado de la última corrida: **46 tests, todos pasan**.
+Las pruebas corren contra una base PostgreSQL real, no contra simulaciones, porque las garantías de concurrencia las da la base. Se ejecutan con `npm test` en `backend/`. Resultado de la última corrida: **47 tests, todos pasan**.
 
 **Reglas críticas probadas**:
 
@@ -154,6 +159,7 @@ Las pruebas corren contra una base PostgreSQL real, no contra simulaciones, porq
 | Última unidad | 30 compras simultáneas con stock 10 | Exactamente 10 pedidos; stock final 0 |
 | Doble escaneo | 50 escaneos simultáneos del mismo QR desde 5 staff | Exactamente 1 canje |
 | Numeración | 15 pagos simultáneos de 2 tickets cada uno | Números del 1 al 30 sin repetir |
+| Reintentos por mala señal | 5 envíos simultáneos del mismo pedido (misma clave) | Un solo pedido; el stock baja una sola vez |
 | Reserva de todo o nada | Cerveza con stock y agua sin stock en el mismo pedido | No se reserva nada |
 | Mismo producto en varios tickets | 2 + 2 cervezas con stock 3 | Rechazado; el stock no cambia |
 | Vencimiento de la reserva | El proceso de vencimiento corre dos veces | El stock se devuelve una sola vez |
@@ -219,6 +225,7 @@ El catálogo a la vista también puede sumar: algunos clientes eligen productos 
 - El ticket es al portador: quien tenga una captura del QR puede retirarlo. Se mitiga mostrando al staff el número y el contenido al canjear.
 - El cliente ve sus tickets solo desde el navegador donde compró, porque la cookie queda en ese navegador.
 - No hay límite de intentos de login.
+- El canje necesita conexión en la barra: no hay modo sin conexión para el staff.
 - La validación del problema es cualitativa: se basa en una entrevista y no incluye mediciones de tiempos de cobro ni de preparación.
 - El impacto en la capacidad de la barra no fue medido; la cifra de la sección anterior es una estimación teórica.
 - El sistema no controla la edad de quien retira: se asume que el control se hace en el ingreso al evento.

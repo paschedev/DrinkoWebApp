@@ -51,6 +51,6 @@ Las llamadas a `/api/...` las reenvía Next.js al backend indicado en `BACKEND_U
 
 La cámara del navegador solo funciona con HTTPS (o en `localhost`).
 
-El carrito se guarda en el navegador (`localStorage`). El cliente se identifica con una cookie httpOnly que crea el backend.
+El carrito se guarda en el navegador (`localStorage`). Con mala señal, el pedido se reintenta con la misma clave de idempotencia (no se duplica), y "Mis tickets" muestra la última copia guardada para poder enseñar el QR sin conexión. El cliente se identifica con una cookie httpOnly que crea el backend.
 
 El despliegue en Vercel está explicado en [docs/deploy.md](../docs/deploy.md).

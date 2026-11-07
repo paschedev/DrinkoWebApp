@@ -29,7 +29,15 @@ export default function ScanPage() {
         setResult({ ok: true, ticket });
         navigator.vibrate?.(150);
       } catch (e) {
-        setResult({ ok: false, message: e instanceof ApiError ? e.message : 'No se pudo canjear' });
+        // Sin respuesta no se sabe si el canje llegó: volver a escanear lo aclara,
+        // porque un ticket ya canjeado responde "ya fue retirado".
+        const message =
+          e instanceof ApiError && e.isNetworkError
+            ? 'Sin conexión: no sabemos si se canjeó. Volvé a escanear el QR.'
+            : e instanceof ApiError
+              ? e.message
+              : 'No se pudo canjear';
+        setResult({ ok: false, message });
         navigator.vibrate?.([100, 60, 100, 60, 100]);
       }
       setBusy(false);
