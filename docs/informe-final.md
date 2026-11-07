@@ -12,7 +12,9 @@
 - **Tutor**: Oscar Londero
 - **Año**: 2026
 - **Repositorio**: https://github.com/paschedev/DrinkoWebApp (versión entregada: tag `[v1.0.0]`)
-- **Sistema desplegado**: [link de Vercel]
+- **Sistema desplegado**: https://drinko-beryl.vercel.app
+  - Evento de prueba: https://drinko-beryl.vercel.app/e/k7f3q9mx (QR en `docs/qr-evento-demo.svg`)
+  - Barra: https://drinko-beryl.vercel.app/login (`staff1@drinko.test` / `drinko-demo-2026`, cuenta ficticia)
 - **API**: https://drinkowebapp-production.up.railway.app
 - **Video**: [link del video]
 
@@ -177,7 +179,9 @@ Las pruebas corren contra una base PostgreSQL real, no contra simulaciones, porq
 - Canje del primer ticket en verde; un segundo intento sale en rojo con la hora del retiro.
 - El stock y la demanda pendiente cambiaron como se esperaba.
 
-[Completar: prueba del escáner con la cámara de celulares reales sobre el deploy, prueba con conectividad degradada y validación con usuarios, si la hay.]
+**Validación en producción** (Vercel + Railway, 07/11): catálogo del evento demo, pedido con dos tickets, pago aprobado y "Mis tickets" con QR, todo a través del dominio de Vercel. La cookie del cliente llega como `HttpOnly` y `Secure`, lo que confirma que el reenvío de `/api` la mantiene en el mismo dominio.
+
+[Completar: canje con la cámara de un celular real sobre el deploy y validación con usuarios, si la hay.]
 
 ## 7. Resultados y conclusiones
 
