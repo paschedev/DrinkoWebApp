@@ -1,7 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
 
 // Ingreso de organizadores y staff.
@@ -11,6 +12,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+
+  // Si ya hay una sesión abierta, se va directo a la barra.
+  useEffect(() => {
+    api('/auth/me')
+      .then(() => router.replace('/bar'))
+      .catch(() => {});
+  }, [router]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -49,6 +57,9 @@ export default function LoginPage() {
           {sending ? 'Ingresando...' : 'Ingresar'}
         </button>
       </form>
+      <p className="center">
+        <Link href="/">Volver al inicio</Link>
+      </p>
     </main>
   );
 }

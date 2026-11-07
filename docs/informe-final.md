@@ -181,7 +181,9 @@ Las pruebas corren contra una base PostgreSQL real, no contra simulaciones, porq
 
 **Validación en producción** (Vercel + Railway, 07/11): catálogo del evento demo, pedido con dos tickets, pago aprobado y "Mis tickets" con QR, todo a través del dominio de Vercel. La cookie del cliente llega como `HttpOnly` y `Secure`, lo que confirma que el reenvío de `/api` la mantiene en el mismo dominio.
 
-[Completar: canje con la cámara de un celular real sobre el deploy y validación con usuarios, si la hay.]
+El escáner de la barra se probó con la cámara de un celular real sobre el deploy: lee el QR de retiro correctamente.
+
+[Completar: validación con usuarios, si la hay.]
 
 ## 7. Resultados y conclusiones
 

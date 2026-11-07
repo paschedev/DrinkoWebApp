@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { CustomerHeader } from '@/components/customer/CustomerHeader';
 import { useCart } from '@/hooks/useCart';
 import { api, ApiError } from '@/lib/api';
 import { formatPrice } from '@/lib/format';
@@ -60,7 +61,12 @@ export default function PaymentPage() {
   }
 
   if (!order) {
-    return <main className="page">{error ? <p className="error">{error}</p> : 'Cargando...'}</main>;
+    return (
+      <main className="page">
+        <CustomerHeader eventCode={code} />
+        {error ? <p className="error">{error}</p> : 'Cargando...'}
+      </main>
+    );
   }
 
   const minutes = Math.floor(secondsLeft / 60);
@@ -70,6 +76,7 @@ export default function PaymentPage() {
 
   return (
     <main className="page">
+      <CustomerHeader eventCode={code} />
       <h1>Pago</h1>
       <p className="muted">{order.event.name}</p>
 

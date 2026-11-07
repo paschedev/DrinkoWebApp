@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { CustomerHeader } from '@/components/customer/CustomerHeader';
 import { MAX_PER_TICKET, useCart } from '@/hooks/useCart';
 import { api, ApiError } from '@/lib/api';
 import { formatPrice, formatTime } from '@/lib/format';
@@ -23,16 +24,18 @@ export default function CatalogPage() {
   if (error) {
     return (
       <main className="page">
+        <CustomerHeader />
         <h1>Ups</h1>
         <p>{error}</p>
       </main>
     );
   }
-  if (!catalog) return <main className="page">Cargando...</main>;
+  if (!catalog) return <main className="page"><CustomerHeader eventCode={code} current="catalog" />Cargando...</main>;
 
   if (catalog.status === 'SCHEDULED') {
     return (
       <main className="page">
+        <CustomerHeader eventCode={code} current="catalog" />
         <h1>{catalog.name}</h1>
         <p>El evento todavía no empezó. Empieza el {formatTime(catalog.startsAt)}</p>
       </main>
@@ -41,9 +44,9 @@ export default function CatalogPage() {
   if (catalog.status === 'FINISHED') {
     return (
       <main className="page">
+        <CustomerHeader eventCode={code} current="catalog" />
         <h1>{catalog.name}</h1>
         <p>El evento terminó. Ya no se pueden hacer compras.</p>
-        <Link href="/tickets">Ver mis tickets</Link>
       </main>
     );
   }
@@ -55,10 +58,8 @@ export default function CatalogPage() {
 
   return (
     <main className="page with-bar">
-      <header className="page-header">
-        <h1>{catalog.name}</h1>
-        <Link href="/tickets">Mis tickets</Link>
-      </header>
+      <CustomerHeader eventCode={code} current="catalog" />
+      <h1>{catalog.name}</h1>
       {cart.tickets.length > 1 && <p className="hint">Agregando al Ticket {cart.active + 1}</p>}
 
       {catalog.categories.map((category) => (
