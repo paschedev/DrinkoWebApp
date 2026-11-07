@@ -185,6 +185,28 @@ export class OrdersService {
     return order ? toOrderView(order) : null;
   }
 
+  // El cliente cancela su pedido pendiente: pasa a EXPIRED (igual que una reserva
+  // vencida) y devuelve el stock. Repetir la cancelación no libera dos veces.
+  async cancelOrder(orderId: string, customerId: string): Promise<OrderView> {
+    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    if (!order || order.customerId !== customerId) {
+      throw new NotFoundException('El pedido no existe');
+    }
+    if (order.status === OrderStatus.PAID) {
+      throw new ConflictException('El pedido ya fue pagado y no se puede cancelar');
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      const changed = await tx.order.updateMany({
+        where: { id: orderId, status: OrderStatus.PENDING_PAYMENT },
+        data: { status: OrderStatus.EXPIRED },
+      });
+      if (changed.count === 1) await this.releaseStock(tx, orderId);
+    }, TRANSACTION_OPTIONS);
+
+    return this.findForCustomer(orderId, customerId);
+  }
+
   // Pasa a EXPIRED los pedidos pendientes vencidos y devuelve su stock.
   // Se puede correr varias veces: cada pedido se libera una sola vez.
   async expireOrders(
