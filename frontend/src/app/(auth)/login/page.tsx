@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Si ya hay una sesión abierta, se va directo a la barra.
   useEffect(() => {
@@ -45,12 +46,16 @@ export default function LoginPage() {
         <label>
           Contraseña
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
           />
+        </label>
+        <label className="toggle">
+          <input type="checkbox" checked={showPassword} onChange={(e) => setShowPassword(e.target.checked)} />
+          Mostrar contraseña
         </label>
         {error && <p className="error">{error}</p>}
         <button className="primary" disabled={sending}>

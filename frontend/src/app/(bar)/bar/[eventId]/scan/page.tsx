@@ -1,13 +1,17 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { FormEvent, useCallback, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { QrScanner } from '@/components/bar/QrScanner';
+import { Loading } from '@/components/ui/Loading';
 import { useStaffRequest } from '@/hooks/useStaffRequest';
 import { ApiError } from '@/lib/api';
 import type { RedeemedTicket } from '@/types/staff';
 
 type Result = { ok: true; ticket: RedeemedTicket } | { ok: false; message: string };
+
+// Segundos que queda el resultado en pantalla antes de volver a la cámara.
+const RESULT_SECONDS = { ok: 6, fail: 8 };
 
 // Canje: al leer el QR el ticket queda retirado. El resultado se muestra grande,
 // en verde o en rojo, porque en la barra hay ruido y poca luz.
@@ -17,6 +21,24 @@ export default function ScanPage() {
   const [result, setResult] = useState<Result | null>(null);
   const [busy, setBusy] = useState(false);
   const [manualToken, setManualToken] = useState('');
+  const [secondsLeft, setSecondsLeft] = useState(0);
+
+  // Después de cada canje la cámara vuelve sola, así el staff atiende al siguiente sin tocar nada.
+  useEffect(() => {
+    if (!result) return;
+    setSecondsLeft(result.ok ? RESULT_SECONDS.ok : RESULT_SECONDS.fail);
+    const timer = setInterval(() => {
+      setSecondsLeft((s) => {
+        if (s <= 1) {
+          clearInterval(timer);
+          setResult(null);
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [result]);
 
   const redeem = useCallback(
     async (token: string) => {
@@ -72,23 +94,27 @@ export default function ScanPage() {
           <button className="secondary" onClick={() => setResult(null)}>
             Escanear otro
           </button>
+          <p className="result-countdown">La cámara vuelve sola en {secondsLeft} s</p>
         </section>
       ) : (
         <>
           <QrScanner onScan={redeem} paused={busy || result !== null} />
-          {busy && <p>Canjeando...</p>}
+          {busy && <Loading text="Canjeando..." />}
         </>
       )}
 
-      <form onSubmit={submitManual} className="form">
-        <label>
-          Código del QR (si la cámara no lo lee)
-          <input value={manualToken} onChange={(e) => setManualToken(e.target.value)} autoComplete="off" />
-        </label>
-        <button className="secondary" disabled={busy}>
-          Canjear
-        </button>
-      </form>
+      <details className="manual">
+        <summary>¿La cámara no lee el QR? Ingresá el código</summary>
+        <form onSubmit={submitManual} className="form">
+          <label>
+            Código del QR
+            <input value={manualToken} onChange={(e) => setManualToken(e.target.value)} autoComplete="off" />
+          </label>
+          <button className="secondary" disabled={busy}>
+            Canjear
+          </button>
+        </form>
+      </details>
     </main>
   );
 }

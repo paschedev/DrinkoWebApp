@@ -35,6 +35,7 @@ function toTicketView(ticket: TicketWithDetails, now: Date) {
     redeemedAt: ticket.redeemedAt,
     createdAt: ticket.createdAt,
     items: ticket.items.map((item) => ({
+      eventProductId: item.eventProductId,
       productName: item.productName,
       unitPriceCents: item.unitPriceCents,
       quantity: item.quantity,

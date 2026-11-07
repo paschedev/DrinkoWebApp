@@ -3,12 +3,15 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Loading } from '@/components/ui/Loading';
 import { useStaffRequest } from '@/hooks/useStaffRequest';
 import { api } from '@/lib/api';
 import { formatTime } from '@/lib/format';
 import type { StaffEvent, StaffUser } from '@/types/staff';
 
 const STATUS_LABEL = { SCHEDULED: 'Programado', IN_PROGRESS: 'En curso', FINISHED: 'Finalizado' };
+// Los eventos en curso primero, después los programados y al final los terminados.
+const STATUS_ORDER = { IN_PROGRESS: 0, SCHEDULED: 1, FINISHED: 2 };
 
 // Eventos en los que el usuario puede operar la barra.
 export default function BarHomePage() {
@@ -27,7 +30,14 @@ export default function BarHomePage() {
     router.replace('/login');
   }
 
-  if (!events) return <main className="page">Cargando...</main>;
+  if (!events) {
+    return (
+      <main className="page">
+        <Loading text="Cargando tus eventos..." />
+      </main>
+    );
+  }
+  const sorted = [...events].sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
 
   return (
     <main className="page">
@@ -38,20 +48,26 @@ export default function BarHomePage() {
         </button>
       </header>
       {user && <p className="muted">Hola, {user.name}</p>}
-      {events.length === 0 && <p>No tenés eventos asignados.</p>}
-      <ul className="list">
-        {events.map((event) => (
-          <li key={event.id} className="row">
-            <div>
-              <strong>{event.name}</strong>
-              <div className="muted">
-                {STATUS_LABEL[event.status]} · {formatTime(event.startsAt)} a {formatTime(event.endsAt)}
-              </div>
-            </div>
-            <Link href={`/bar/${event.id}/scan`}>Abrir</Link>
-          </li>
-        ))}
-      </ul>
+      {events.length === 0 && <p className="card">No tenés eventos asignados. Pedile al organizador que te asigne.</p>}
+      {events.length > 0 && (
+        <ul className="list">
+          {sorted.map((event) => (
+            <li key={event.id}>
+              <Link href={`/bar/${event.id}/scan`} className="row row-link">
+                <div>
+                  <strong>{event.name}</strong>
+                  <div className="muted">
+                    {formatTime(event.startsAt)} a {formatTime(event.endsAt)}
+                  </div>
+                </div>
+                <span className={event.status === 'IN_PROGRESS' ? 'badge active' : 'badge'}>
+                  {STATUS_LABEL[event.status]} ›
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 }

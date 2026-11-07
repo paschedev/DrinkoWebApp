@@ -1,11 +1,15 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
+import { Loading } from '@/components/ui/Loading';
 import { useStaffRequest } from '@/hooks/useStaffRequest';
 import { ApiError } from '@/lib/api';
 import { formatPrice } from '@/lib/format';
 import type { Offer } from '@/types/staff';
+
+type Change = { priceCents?: number; isAvailable?: boolean; stockDelta?: number };
+type SaveState = { kind: 'saving' } | { kind: 'saved'; text: string } | { kind: 'error'; text: string } | null;
 
 // Precio, stock y disponibilidad de cada producto del evento.
 export default function ProductsPage() {
@@ -20,25 +24,22 @@ export default function ProductsPage() {
       .catch((e) => setError(e instanceof ApiError ? e.message : 'No se pudieron cargar los productos'));
   }, [eventId, request]);
 
-  async function update(offer: Offer, body: { priceCents?: number; isAvailable?: boolean; stockDelta?: number }) {
-    setError(null);
-    try {
-      const updated = await request<Offer>(`/staff/events/${eventId}/products/${offer.eventProductId}`, {
-        method: 'PATCH',
-        body,
-      });
-      setOffers((prev) => prev?.map((o) => (o.eventProductId === updated.eventProductId ? updated : o)) ?? null);
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'No se pudo guardar el cambio');
-    }
+  async function update(offer: Offer, body: Change) {
+    const updated = await request<Offer>(`/staff/events/${eventId}/products/${offer.eventProductId}`, {
+      method: 'PATCH',
+      body,
+    });
+    setOffers((prev) => prev?.map((o) => (o.eventProductId === updated.eventProductId ? updated : o)) ?? null);
   }
 
-  if (!offers) return <main className="page">{error ? <p className="error">{error}</p> : 'Cargando...'}</main>;
+  if (!offers) {
+    return <main className="page">{error ? <p className="error">{error}</p> : <Loading text="Cargando productos..." />}</main>;
+  }
 
   return (
     <main className="page">
       <h1>Productos</h1>
-      {error && <p className="error">{error}</p>}
+      <p className="muted">Los cambios se aplican en el momento y quedan registrados.</p>
       {offers.map((offer) => (
         <OfferRow key={offer.eventProductId} offer={offer} onChange={(body) => update(offer, body)} />
       ))}
@@ -46,67 +47,103 @@ export default function ProductsPage() {
   );
 }
 
-function OfferRow({
-  offer,
-  onChange,
-}: {
-  offer: Offer;
-  onChange: (body: { priceCents?: number; isAvailable?: boolean; stockDelta?: number }) => void;
-}) {
+function OfferRow({ offer, onChange }: { offer: Offer; onChange: (body: Change) => Promise<void> }) {
   const [price, setPrice] = useState(String(offer.priceCents / 100));
-  const [delta, setDelta] = useState('');
+  const [units, setUnits] = useState('');
+  const [state, setState] = useState<SaveState>(null);
 
-  function savePrice() {
-    const pesos = Number(price.replace(',', '.'));
-    if (pesos > 0 && Math.round(pesos * 100) !== offer.priceCents) onChange({ priceCents: Math.round(pesos * 100) });
+  async function save(body: Change, savedText: string) {
+    setState({ kind: 'saving' });
+    try {
+      await onChange(body);
+      setState({ kind: 'saved', text: savedText });
+    } catch (e) {
+      setState({ kind: 'error', text: e instanceof ApiError ? e.message : 'No se pudo guardar el cambio' });
+    }
+  }
+
+  // El precio cambia lo que se cobra: se pide confirmación antes de guardarlo.
+  function savePrice(event: FormEvent) {
+    event.preventDefault();
+    const cents = Math.round(Number(price.replace(',', '.')) * 100);
+    if (!(cents > 0)) {
+      setState({ kind: 'error', text: 'Ingresá un precio mayor a cero' });
+      return;
+    }
+    if (cents === offer.priceCents) return;
+    const question = `¿Cambiar el precio de ${offer.name} de ${formatPrice(offer.priceCents)} a ${formatPrice(cents)}?`;
+    if (!window.confirm(question)) {
+      setPrice(String(offer.priceCents / 100));
+      return;
+    }
+    save({ priceCents: cents }, `Precio guardado: ${formatPrice(cents)}`);
   }
 
   function adjustStock(sign: 1 | -1) {
-    const units = Number(delta);
-    if (Number.isInteger(units) && units > 0) onChange({ stockDelta: sign * units });
-    setDelta('');
+    const amount = Number(units);
+    if (!Number.isInteger(amount) || amount <= 0) {
+      setState({ kind: 'error', text: 'Ingresá una cantidad entera de unidades' });
+      return;
+    }
+    setUnits('');
+    save({ stockDelta: sign * amount }, sign > 0 ? `Se sumaron ${amount} unidades` : `Se descontaron ${amount} unidades`);
   }
+
+  const priceChanged = Math.round(Number(price.replace(',', '.')) * 100) !== offer.priceCents;
 
   return (
     <section className={offer.isAvailable ? 'card' : 'card unavailable'}>
       <div className="page-header">
         <h2>{offer.name}</h2>
         <label className="toggle">
-          <input type="checkbox" checked={offer.isAvailable} onChange={(e) => onChange({ isAvailable: e.target.checked })} />
+          <input
+            type="checkbox"
+            checked={offer.isAvailable}
+            onChange={(e) =>
+              save({ isAvailable: e.target.checked }, e.target.checked ? 'Disponible para la venta' : 'Pausado: no se vende')
+            }
+          />
           Disponible
         </label>
       </div>
 
-      <div className="field-row">
+      <form className="field-row" onSubmit={savePrice}>
         <label>
           Precio ($)
-          <input inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} onBlur={savePrice} />
+          <input inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} />
         </label>
-        <span className="muted">{formatPrice(offer.priceCents)}</span>
-      </div>
+        <button className="small-button wide" disabled={!priceChanged}>
+          Guardar
+        </button>
+      </form>
 
       {offer.stock === null ? (
         <p className="muted">Sin control de stock</p>
       ) : (
         <div className="field-row">
-          <span>
-            Stock: <strong>{offer.stock}</strong>
-          </span>
-          <input
-            className="small-input"
-            inputMode="numeric"
-            placeholder="Unidades"
-            value={delta}
-            onChange={(e) => setDelta(e.target.value)}
-          />
-          <button className="small-button" onClick={() => adjustStock(1)} aria-label="Sumar al stock">
-            +
+          <label>
+            Stock actual: {offer.stock}
+            <input
+              className="small-input"
+              inputMode="numeric"
+              placeholder="Cantidad"
+              aria-label={`Unidades para sumar o descontar de ${offer.name}`}
+              value={units}
+              onChange={(e) => setUnits(e.target.value)}
+            />
+          </label>
+          <button className="small-button wide" onClick={() => adjustStock(1)}>
+            + Sumar
           </button>
-          <button className="small-button" onClick={() => adjustStock(-1)} aria-label="Restar del stock">
-            −
+          <button className="small-button wide" onClick={() => adjustStock(-1)}>
+            − Restar
           </button>
         </div>
       )}
+
+      {state?.kind === 'saving' && <p className="save-status muted">Guardando...</p>}
+      {state?.kind === 'saved' && <p className="save-status muted">✓ {state.text}</p>}
+      {state?.kind === 'error' && <p className="save-status error">{state.text}</p>}
     </section>
   );
 }

@@ -31,6 +31,13 @@ export class OrdersController {
     return order;
   }
 
+  @Post('orders/:id/cancel')
+  async cancel(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    const customer = await this.customers.findFromRequest(req);
+    if (!customer) throw new NotFoundException('El pedido no existe');
+    return this.orders.cancelOrder(id, customer.id);
+  }
+
   @Get('orders/:id')
   async findOne(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
     const customer = await this.customers.findFromRequest(req);

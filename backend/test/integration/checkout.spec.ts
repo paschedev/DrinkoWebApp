@@ -216,6 +216,49 @@ describe('Compra: reserva de stock, vencimiento y pago simulado', () => {
     });
   });
 
+  describe('cancelar el pedido pendiente', () => {
+    it('libera el stock una sola vez y permite armar un pedido nuevo', async () => {
+      const { event, offers } = await createEventFixture(prisma, [
+        { name: 'Cerveza', priceCents: 5000, stock: 10 },
+      ]);
+      const customer = await createCustomer(prisma);
+      const created = await orders.createOrder(event.accessCode, customer.id, order([item(offers.Cerveza, 3)]));
+
+      const cancelled = await orders.cancelOrder(created.id, customer.id);
+      await orders.cancelOrder(created.id, customer.id);
+
+      expect(cancelled.status).toBe(OrderStatus.EXPIRED);
+      expect(await getStock(prisma, offers.Cerveza)).toBe(10);
+      // El pedido pendiente ya no bloquea uno nuevo en el mismo evento.
+      await orders.createOrder(event.accessCode, customer.id, order([item(offers.Cerveza, 1)]));
+      expect(await getStock(prisma, offers.Cerveza)).toBe(9);
+    });
+
+    it('un pedido pagado no se puede cancelar', async () => {
+      const { event, offers } = await createEventFixture(prisma, [
+        { name: 'Cerveza', priceCents: 5000, stock: 10 },
+      ]);
+      const customer = await createCustomer(prisma);
+      const created = await orders.createOrder(event.accessCode, customer.id, order([item(offers.Cerveza, 2)]));
+      await payments.paySimulated(created.id, customer.id, true);
+
+      await expect(orders.cancelOrder(created.id, customer.id)).rejects.toThrow(/pagado/i);
+      expect(await getStock(prisma, offers.Cerveza)).toBe(8);
+    });
+
+    it('solo el dueño puede cancelar su pedido', async () => {
+      const { event, offers } = await createEventFixture(prisma, [
+        { name: 'Cerveza', priceCents: 5000, stock: 10 },
+      ]);
+      const owner = await createCustomer(prisma);
+      const other = await createCustomer(prisma);
+      const created = await orders.createOrder(event.accessCode, owner.id, order([item(offers.Cerveza, 2)]));
+
+      await expect(orders.cancelOrder(created.id, other.id)).rejects.toThrow(/no existe/i);
+      expect(await getStock(prisma, offers.Cerveza)).toBe(8);
+    });
+  });
+
   describe('pago simulado', () => {
     it('al aprobar, marca pago y pedido y activa los tickets con número y token', async () => {
       const { event, offers } = await createEventFixture(prisma, [

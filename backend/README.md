@@ -55,6 +55,7 @@ El despliegue en Railway está explicado en [docs/deploy.md](../docs/deploy.md).
 | `GET /api/events/:code/orders/pending` | Pedido pendiente del cliente en ese evento |
 | `GET /api/orders/:id` | Detalle de un pedido del cliente |
 | `POST /api/orders/:id/payment` | Pago simulado: `{ "approved": true }` o `false` |
+| `POST /api/orders/:id/cancel` | Cancela el pedido pendiente y libera el stock (pasa a `EXPIRED`) |
 | `GET /api/tickets` | Tickets pagados del cliente |
 | `GET /api/tickets/:token` | Ticket por su token (el contenido del QR) |
 
