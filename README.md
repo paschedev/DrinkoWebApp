@@ -7,7 +7,8 @@
 * **Repositorio Oficial**: https://github.com/paschedev/DrinkoWebApp
 
 ### Entrega final
-* **Sistema desplegado**: _pendiente de publicar_ (QR de acceso de la demo: `/e/k7f3q9mx`)
+* **Sistema desplegado**: _frontend pendiente de publicar_ (QR de acceso de la demo: `/e/k7f3q9mx`)
+* **API**: https://drinkowebapp-production.up.railway.app/api/health
 * **Informe Final (PDF)**: _pendiente_ (borrador en [docs/informe-final.md](docs/informe-final.md))
 * **Video de presentación**: _pendiente_
 * **Cuentas de demostración**: usuarios ficticios `@drinko.test`, detallados en [backend/README.md](backend/README.md#usuarios-de-prueba).
