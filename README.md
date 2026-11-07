@@ -7,11 +7,15 @@
 * **Repositorio Oficial**: https://github.com/paschedev/DrinkoWebApp
 
 ### Entrega final
-* **Sistema desplegado**: _frontend pendiente de publicar_ (QR de acceso de la demo: `/e/k7f3q9mx`)
-* **API**: https://drinkowebapp-production.up.railway.app/api/health
+* **Sistema desplegado**: https://drinko-beryl.vercel.app
+  * **Evento de prueba (cliente)**: https://drinko-beryl.vercel.app/e/k7f3q9mx, o escaneando el QR de acceso de abajo con el celular.
+  * **Barra (staff)**: https://drinko-beryl.vercel.app/login, con `staff1@drinko.test` y contraseña `drinko-demo-2026` (cuenta ficticia de demostración).
+  * **API**: https://drinkowebapp-production.up.railway.app/api/health
 * **Informe Final (PDF)**: _pendiente_ (borrador en [docs/informe-final.md](docs/informe-final.md))
 * **Video de presentación**: _pendiente_
 * **Cuentas de demostración**: usuarios ficticios `@drinko.test`, detallados en [backend/README.md](backend/README.md#usuarios-de-prueba).
+
+<img src="docs/qr-evento-demo.svg" alt="QR de acceso al evento de prueba" width="200">
 
 ## 1. Definición del Problema
 * La experiencia de compra de bebidas en barras de eventos masivos y discotecas presenta un alto nivel de fricción.
