@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { CustomerHeader } from '@/components/customer/CustomerHeader';
 import { TicketCard } from '@/components/customer/TicketCard';
 import { api, ApiError } from '@/lib/api';
 import { loadTickets, saveTickets } from '@/lib/ticketCache';
@@ -35,14 +36,17 @@ export default function MyTicketsPage() {
   if (error) {
     return (
       <main className="page">
+        <CustomerHeader current="tickets" />
         <p className="error">No se pudieron cargar tus tickets.</p>
       </main>
     );
   }
-  if (!tickets) return <main className="page">Cargando...</main>;
+  if (!tickets) return <main className="page"><CustomerHeader current="tickets" />Cargando...</main>;
 
   return (
     <main className="page">
+      {/* El catálogo al que se vuelve es el del evento de la compra más reciente. */}
+      <CustomerHeader eventCode={tickets[0]?.eventCode} current="tickets" />
       <h1>Mis tickets</h1>
       {offline && (
         <p className="notice">Sin conexión: te mostramos los tickets guardados en este celular. Igual podés retirar.</p>

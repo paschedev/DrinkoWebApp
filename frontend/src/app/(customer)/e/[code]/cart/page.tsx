@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { CustomerHeader } from '@/components/customer/CustomerHeader';
 import { MAX_PER_TICKET, useCart } from '@/hooks/useCart';
 import { api, ApiError } from '@/lib/api';
 import { formatPrice } from '@/lib/format';
@@ -71,11 +72,12 @@ export default function CartPage() {
     }
   }
 
-  if (!cart.loaded) return <main className="page">Cargando...</main>;
+  if (!cart.loaded) return <main className="page"><CustomerHeader eventCode={code} />Cargando...</main>;
 
   if (cart.itemCount === 0) {
     return (
       <main className="page">
+        <CustomerHeader eventCode={code} />
         <h1>Tu carrito está vacío</h1>
         <Link href={`/e/${code}`}>Volver al catálogo</Link>
       </main>
@@ -84,10 +86,8 @@ export default function CartPage() {
 
   return (
     <main className="page">
-      <header className="page-header">
-        <h1>Carrito</h1>
-        <Link href={`/e/${code}`}>Catálogo</Link>
-      </header>
+      <CustomerHeader eventCode={code} />
+      <h1>Carrito</h1>
       <p className="notice">
         Cada ticket se retira completo y de una sola vez. Si querés retirar en momentos distintos, separá tu compra en
         varios tickets.
