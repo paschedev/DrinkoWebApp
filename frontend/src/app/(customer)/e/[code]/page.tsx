@@ -97,9 +97,15 @@ export default function CatalogPage() {
               const info = { eventProductId: product.eventProductId, name: product.name, priceCents: product.priceCents };
               return (
                 <li key={product.eventProductId} className={product.soldOut ? 'row sold-out' : 'row'}>
-                  <div>
-                    <strong>{product.name}</strong>
-                    <div className="muted">{product.soldOut ? 'Agotado' : formatPrice(product.priceCents)}</div>
+                  <div className="row-main">
+                    {product.imageUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={product.imageUrl} alt="" className="product-thumb" loading="lazy" />
+                    )}
+                    <div>
+                      <strong>{product.name}</strong>
+                      <div className="muted">{product.soldOut ? 'Agotado' : formatPrice(product.priceCents)}</div>
+                    </div>
                   </div>
                   {!product.soldOut && (
                     <div className="stepper">

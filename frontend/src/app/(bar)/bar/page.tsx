@@ -48,6 +48,11 @@ export default function BarHomePage() {
         </button>
       </header>
       {user && <p className="muted">Hola, {user.name}</p>}
+      {user?.role === 'ORGANIZER' && (
+        <Link href="/panel" className="button-link">
+          Ir al Panel del Organizador
+        </Link>
+      )}
       {events.length === 0 && <p className="card">No tenés eventos asignados. Pedile al organizador que te asigne.</p>}
       {events.length > 0 && (
         <ul className="list">

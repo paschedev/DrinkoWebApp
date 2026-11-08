@@ -10,6 +10,16 @@ import type { RedeemedTicket } from '@/types/staff';
 
 type Result = { ok: true; ticket: RedeemedTicket } | { ok: false; message: string };
 
+// El QR de retiro tiene 128 bits en base64url: 22 caracteres.
+const TOKEN_PATTERN = /^[A-Za-z0-9_-]{22}$/;
+
+// Acepta el código solo o el link del ticket (.../t/<código>), sin espacios.
+function extractToken(input: string) {
+  const text = input.trim();
+  const fromLink = text.match(/\/t\/([A-Za-z0-9_-]{22})\/?$/);
+  return fromLink ? fromLink[1] : text;
+}
+
 // Segundos que queda el resultado en pantalla antes de volver a la cámara.
 const RESULT_SECONDS = { ok: 6, fail: 8 };
 
@@ -67,9 +77,13 @@ export default function ScanPage() {
     [eventId, request],
   );
 
+  const manualCode = extractToken(manualToken);
+  const manualValid = TOKEN_PATTERN.test(manualCode);
+
   function submitManual(event: FormEvent) {
     event.preventDefault();
-    if (manualToken.trim()) redeem(manualToken.trim());
+    if (!manualValid) return;
+    redeem(manualCode);
     setManualToken('');
   }
 
@@ -108,9 +122,19 @@ export default function ScanPage() {
         <form onSubmit={submitManual} className="form">
           <label>
             Código del QR
-            <input value={manualToken} onChange={(e) => setManualToken(e.target.value)} autoComplete="off" />
+            <input
+              value={manualToken}
+              onChange={(e) => setManualToken(e.target.value)}
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              placeholder="22 caracteres o el link del ticket"
+            />
           </label>
-          <button className="secondary" disabled={busy}>
+          {manualToken.trim() !== '' && !manualValid && (
+            <p className="muted">El código del QR tiene 22 caracteres (letras, números, - y _).</p>
+          )}
+          <button className="secondary" disabled={busy || !manualValid}>
             Canjear
           </button>
         </form>

@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'crypto';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuthUser } from './auth-user';
@@ -12,6 +12,10 @@ export const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 const DUMMY_HASH =
   '$argon2id$v=19$m=65536,t=3,p=4$CB7eOsNhgqZYer9xxRPBmQ$tSy8MPT05vwwAV1nu3Sne4SMdgdkHXO7rs3wjtB6Pj0';
 
+// Límite de intentos fallidos por email e IP, para frenar a quien prueba contraseñas.
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCK_WINDOW_MS = 15 * 60 * 1000;
+
 export function hashToken(token: string) {
   return createHash('sha256').update(token).digest();
 }
@@ -20,14 +24,28 @@ export function hashToken(token: string) {
 // tabla sessions solo queda su hash. Cerrar sesión es borrar la fila.
 @Injectable()
 export class AuthService {
+  // En memoria: alcanza con una sola instancia del backend. Con varias, iría a la base o a Redis.
+  private readonly failedAttempts = new Map<string, { count: number; firstAt: number }>();
+
   constructor(private readonly prisma: PrismaService) {}
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string, ip = 'unknown') {
+    const key = `${email.toLowerCase()}|${ip}`;
+    const attempts = this.failedAttempts.get(key);
+    const now = Date.now();
+    if (attempts && now - attempts.firstAt > LOCK_WINDOW_MS) this.failedAttempts.delete(key);
+    else if (attempts && attempts.count >= MAX_FAILED_ATTEMPTS) {
+      throw new HttpException('Demasiados intentos. Probá de nuevo en unos minutos.', HttpStatus.TOO_MANY_REQUESTS);
+    }
+
     const user = await this.prisma.user.findUnique({ where: { email: email.toLowerCase() } });
     const valid = await argon2.verify(user?.passwordHash ?? DUMMY_HASH, password).catch(() => false);
     if (!user || !user.passwordHash || !valid || !user.isActive) {
+      const current = this.failedAttempts.get(key);
+      this.failedAttempts.set(key, { count: (current?.count ?? 0) + 1, firstAt: current?.firstAt ?? now });
       throw new UnauthorizedException('Email o contraseña incorrectos');
     }
+    this.failedAttempts.delete(key);
 
     const token = randomBytes(32).toString('base64url');
     await this.prisma.session.create({

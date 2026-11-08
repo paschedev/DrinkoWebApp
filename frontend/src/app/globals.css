@@ -89,6 +89,12 @@
   box-sizing: border-box;
 }
 
+/* Reserva siempre el lugar de la barra de scroll: así el contenido no se corre
+   unos píxeles al pasar de una pantalla corta a una larga. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -695,4 +701,82 @@ details.manual summary {
 
 .steps li {
   padding: 4px 0;
+}
+
+/* Panel del Organizador */
+
+.button-link.primary-link {
+  background: var(--primary);
+  color: var(--on-primary);
+  border: none;
+}
+
+.list.spaced {
+  margin-top: 16px;
+}
+
+.fieldset {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin: 0;
+}
+
+.fieldset legend {
+  font-size: 0.9rem;
+  padding: 0 4px;
+}
+
+.field-row label {
+  flex: 1;
+}
+
+select {
+  min-height: 44px;
+}
+
+.product-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.row-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Al imprimir el QR de acceso, solo sale la tarjeta del QR. */
+@media print {
+  .bar-header,
+  .site-footer,
+  .no-print,
+  .page > .muted,
+  .page > .page-header .badge {
+    display: none !important;
+  }
+  .print-area {
+    border: none;
+    box-shadow: none;
+  }
+}
+
+/* Los campos en fila se achican en pantallas angostas en lugar de desbordar. */
+.field-row label {
+  min-width: 0;
+}
+
+.field-row input {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Casilla y texto en la misma línea, también dentro de un formulario. */
+.form label.toggle {
+  flex-direction: row;
+  align-items: center;
+  font-size: 0.95rem;
 }

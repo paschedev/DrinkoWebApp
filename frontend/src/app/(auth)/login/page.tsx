@@ -16,8 +16,8 @@ export default function LoginPage() {
 
   // Si ya hay una sesión abierta, se va directo a la barra.
   useEffect(() => {
-    api('/auth/me')
-      .then(() => router.replace('/bar'))
+    api<{ role: string }>('/auth/me')
+      .then((me) => router.replace(me.role === 'ORGANIZER' ? '/panel' : '/bar'))
       .catch(() => {});
   }, [router]);
 
@@ -26,8 +26,9 @@ export default function LoginPage() {
     setSending(true);
     setError(null);
     try {
-      await api('/auth/login', { method: 'POST', body: { email, password } });
-      router.push('/bar');
+      // El organizador entra a su panel; el staff, a la barra.
+      const user = await api<{ role: string }>('/auth/login', { method: 'POST', body: { email, password } });
+      router.push(user.role === 'ORGANIZER' ? '/panel' : '/bar');
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'No se pudo iniciar sesión');
       setSending(false);

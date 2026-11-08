@@ -39,6 +39,17 @@ Las llamadas a `/api/...` las reenvía Next.js al backend indicado en `BACKEND_U
 | `/tickets` | Mis tickets, con el QR de retiro |
 | `/t/[token]` | Un ticket suelto |
 
+## Panel del Organizador
+
+| Ruta | Pantalla |
+| :--- | :--- |
+| `/panel` | Eventos de la productora |
+| `/panel/events/new` | Nuevo evento: nombre, inicio, fin y staff |
+| `/panel/events/[id]` | QR de acceso para imprimir, edición según el estado, staff y productos del evento |
+| `/panel/catalog` | Catálogo maestro: crear, editar, archivar y borrar productos |
+
+Al ingresar, el organizador va a `/panel` y el staff a `/bar`.
+
 ## Barra
 
 | Ruta | Pantalla |
@@ -57,6 +68,8 @@ La cámara del navegador solo funciona con HTTPS (o en `localhost`).
 - Carrito: duplicar un ticket, dividirlo en dos (con cantidades impares, el primero se lleva la unidad extra) y confirmar antes de quitar uno.
 - Pago: se puede cancelar el pedido pendiente, lo que libera la reserva al instante.
 - Mis tickets: primero los que se pueden retirar y después el historial; "Repetir compra" copia los productos de un ticket al carrito con los precios actuales y avisa si alguno ya no está disponible.
+- Encabezados de seguridad en todas las páginas (no se pueden embeber en iframes, `nosniff`, `Referrer-Policy`) y la cámara permitida solo para el propio sitio.
+- Barra: la carga manual del código solo se habilita con el formato del QR (22 caracteres) y acepta pegar el link del ticket.
 - Barra: el escáner vuelve solo a la cámara después de cada canje, y cada cambio de productos confirma que se guardó (el de precio pide confirmación antes).
 
 El carrito se guarda en el navegador (`localStorage`). Con mala señal, el pedido se reintenta con la misma clave de idempotencia (no se duplica), y "Mis tickets" muestra la última copia guardada para poder enseñar el QR sin conexión. El cliente se identifica con una cookie httpOnly que crea el backend.
