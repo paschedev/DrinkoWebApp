@@ -10,6 +10,7 @@
 * **Sistema desplegado**: https://drinko-beryl.vercel.app
   * **Evento de prueba (cliente)**: https://drinko-beryl.vercel.app/e/k7f3q9mx, o escaneando el QR de acceso de abajo con el celular.
   * **Barra (staff)**: https://drinko-beryl.vercel.app/login, con `staff1@drinko.test` y contraseña `drinko-demo-2026` (cuenta ficticia de demostración).
+  * **Panel del Organizador**: el mismo login con `organizador@drinko.test` y la misma contraseña.
   * **API**: https://drinkowebapp-production.up.railway.app/api/health
 * **Informe Final (PDF)**: _pendiente_ (borrador en [docs/informe-final.md](docs/informe-final.md))
 * **Video de presentación**: _pendiente_
@@ -98,12 +99,13 @@ Los nombres de tablas, columnas, variables y archivos de código están en ingl�
 Implementado y probado:
 * **Cliente**: QR de acceso al evento, catálogo, carrito dividido en tickets, reserva de stock, pago simulado (aprobado o rechazado), mis tickets con su QR de retiro.
 * **Barra**: login de organizadores y staff, escáner de QR con canje atómico, panel de precio, stock y disponibilidad, y demanda pendiente.
+* **Panel del Organizador**: crear, editar y eliminar eventos según su estado, QR de acceso para imprimir, asignación de staff y catálogo maestro de productos.
+* **Seguridad**: control de acceso por cliente, staff y productora (IDOR), CSRF, límite de intentos de login y encabezados de seguridad.
 * **Reglas críticas** cubiertas por tests contra PostgreSQL: reserva de todo el pedido o nada, última unidad con compras simultáneas, vencimiento de la reserva, aprobación tardía, numeración de tickets, doble escaneo simultáneo y separación entre productoras.
 
 Fuera de esta entrega:
-* **Panel del Organizador** (ABM del catálogo maestro, creación de eventos y asignación de staff): los datos se cargan con el seed.
 * **Integración con Mercado Pago**: el pago es simulado.
-* Invitaciones de staff por enlace y métricas de venta.
+* Alta de staff por invitación (los usuarios de staff se cargan con el seed) y métricas de venta.
 
 ## 9. Cómo Ejecutarlo
 Requiere Node.js 22 o superior y Docker (para la base de datos).
@@ -115,6 +117,6 @@ cd frontend && cp .env.example .env.local && npm install && npm run dev
 ```
 
 * Cliente: `http://localhost:3000/e/k7f3q9mx` (evento de prueba del seed).
-* Barra: `http://localhost:3000/login`. Las cuentas de prueba están en [backend/README.md](backend/README.md).
+* Barra y Panel del Organizador: `http://localhost:3000/login` (el organizador entra a `/panel`, el staff a `/bar`). Las cuentas de prueba están en [backend/README.md](backend/README.md).
 * Tests del backend: `cd backend && npm test`.
 * Despliegue y variables de entorno: [docs/deploy.md](docs/deploy.md).

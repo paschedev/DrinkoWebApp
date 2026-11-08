@@ -74,6 +74,30 @@ Requieren la sesión de un organizador o de un staff (cookie httpOnly `drinko_se
 | `PATCH /api/staff/events/:id/products/:productId` | Cambia precio o disponibilidad, o ajusta el stock con `stockDelta` (+/- unidades) |
 | `GET /api/staff/events/:id/demand` | Unidades vendidas que todavía no se retiraron |
 
+## Endpoints del Panel del Organizador
+
+Requieren la sesión de un usuario con rol `ORGANIZER`. Todas las consultas se filtran por su productora: un evento o producto de otra productora responde 404.
+
+| Método y ruta | Qué hace |
+| :--- | :--- |
+| `GET /api/organizer/events` | Eventos de la productora |
+| `POST /api/organizer/events` | Crea un evento (nombre, inicio, fin y staff); el código de acceso lo genera el servidor |
+| `GET /api/organizer/events/:id` | Detalle con oferta y staff |
+| `PATCH /api/organizer/events/:id` | Programado: edita todo. En curso: nombre o extender el fin. Finalizado: solo lectura |
+| `DELETE /api/organizer/events/:id` | Solo si nunca empezó y no tiene pedidos |
+| `PUT /api/organizer/events/:id/staff` | Staff asignado (solo de la productora) |
+| `POST /api/organizer/events/:id/products` | Suma productos del catálogo a la oferta, con precio y stock opcional |
+| `GET /api/organizer/staff`, `GET /api/organizer/categories` | Staff y categorías de la productora |
+| `GET/POST /api/organizer/products`, `PATCH/DELETE /api/organizer/products/:id` | Catálogo maestro. Un producto ya ofrecido en un evento se archiva, no se borra |
+
+## Seguridad
+
+- **IDOR**: cada ruta con un id verifica que el recurso sea del cliente de la cookie (pedidos), del staff asignado o del organizador de la productora (eventos y productos). Hay tests de acceso cruzado.
+- **CORS**: no se habilita. El frontend llama a `/api` desde su mismo dominio a través del rewrite de Next.js, así que una página de otro origen no puede leer las respuestas.
+- **CSRF**: cookies `SameSite=Lax` y, además, se rechazan las escrituras que el navegador marca con `Sec-Fetch-Site: cross-site`.
+- **Login**: contraseñas con Argon2id; después de 5 intentos fallidos con el mismo email e IP, el login queda bloqueado 15 minutos (429).
+- **Encabezados**: `helmet` (nosniff, sin iframes de otros sitios, HSTS, sin `X-Powered-By`). Los errores nunca incluyen el stack trace.
+
 El canje es un único `UPDATE` que solo afecta la fila si el token es válido, el ticket es de ese evento, está `ACTIVE`, no venció (fin del evento + 1 hora) y quien escanea puede operar la barra. Si dos barras escanean el mismo QR a la vez, solo una lo canjea. Cada cambio de precio, stock o disponibilidad queda en `change_logs`.
 
 ## Tests
@@ -90,6 +114,8 @@ Corren contra una base PostgreSQL real (`drinko_test` en el Docker local, o la d
 - `test/integration/redeem.spec.ts`: canje OK, ticket ya retirado, vencido, de otro evento, sin pagar y staff no asignado.
 - `test/concurrency/redeem.concurrency.spec.ts`: 50 escaneos simultáneos del mismo QR desde 5 staff: exactamente 1 canje.
 - `test/integration/staff-http.spec.ts`: login, logout, eventos asignados, canje por HTTP, demanda pendiente y cambios de precio, stock y disponibilidad con su registro.
+- `test/integration/organizer-http.spec.ts`: panel del organizador (productos, eventos, reglas de edición y acceso cruzado entre productoras).
+- `test/integration/security.spec.ts`: encabezados, CORS, CSRF, límite de intentos de login, cookies, IDOR de pedidos y formato del código del QR.
 - Recursos de productoras distintas: un pedido no puede incluir productos de otro evento, un organizador no opera eventos de otra productora y un producto no se edita desde un evento que no es el suyo.
 
 La migración inicial (`prisma/migrations/`) es equivalente a `database/ddl.sql`. Los CHECK, los índices parciales y las vistas no se pueden declarar en `schema.prisma`, por eso están escritos a mano al final de esa migración.
