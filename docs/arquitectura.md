@@ -29,7 +29,7 @@ flowchart LR
 - **Monolito modular en vez de microservicios**: para un equipo de dos personas es más simple de desarrollar y desplegar, y los módulos mantienen el código ordenado.
 - **Una sola app de frontend** para las tres áreas: comparten componentes y un único deploy.
 - **El frontend reenvía `/api` al backend**: las cookies de sesión quedan en el mismo dominio y el navegador no las bloquea.
-- **Stock y canje atómicos**: cada uno se resuelve con una sola sentencia `UPDATE` condicional. Si dos personas compran la última unidad o dos barras escanean el mismo QR a la vez, solo una operación se concreta.
+- **Stock y canje atómicos**: la reserva de un pedido es una transacción con un `UPDATE` condicional por producto (`stock >= cantidad`); si falta uno, se revierte todo. El canje es un único `UPDATE` condicional sobre el ticket. Si dos personas compran la última unidad o dos barras escanean el mismo QR a la vez, solo una operación se concreta.
 - **Cliente sin cuenta**: se identifica con una cookie segura que emite el servidor. Organizadores y staff inician sesión con email y contraseña.
 - **Varias productoras en la misma plataforma**: cada una ve solo sus datos, así el sistema se puede ofrecer como servicio.
-- **Pagos simulados detrás de una interfaz**: Mercado Pago se puede sumar después sin cambiar el resto del sistema.
+- **Pago simulado aislado en su módulo**: la aprobación del pago (cerrar el pedido, registrar el pago y activar los tickets) vive en `payments`. Para sumar Mercado Pago hay que cambiar ese módulo, no la compra ni el canje.

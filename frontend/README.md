@@ -9,8 +9,8 @@ frontend/
     ├── app/
     │   ├── (customer)/     cliente: /e/[code] (catálogo, carrito y pago), /tickets, /t/[token]
     │   ├── (bar)/          barra: /bar/[eventId] (escáner, productos y demanda pendiente)
-    │   ├── (panel)/        Panel del Organizador: /panel (catálogo, eventos, staff e historial)
-    │   └── (auth)/         /login e /invite/[token]
+    │   ├── (panel)/        Panel del Organizador: /panel (eventos y catálogo)
+    │   └── (auth)/         /login
     ├── components/         componentes compartidos y de cada área
     ├── hooks/
     ├── lib/                cliente de la API y utilidades
