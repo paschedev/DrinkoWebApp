@@ -27,12 +27,12 @@
 
 ## 2. Alcance del Proyecto
 * El proyecto consiste en una plataforma web transaccional estructurada bajo el modelo de "Compra Virtual y Retiro Rápido".
-* A través del escaneo del QR de acceso del evento, los usuarios podrán acceder al catálogo digital, realizar el pedido, procesar el pago y obtener uno o más tickets digitales de retiro, cada uno con su propio QR.
+* A través del escaneo del QR de acceso del evento, los usuarios acceden al catálogo digital, realizan el pedido, procesan el pago y obtienen uno o más tickets digitales de retiro, cada uno con su propio QR.
 * El asistente compra sin crear una cuenta. El sistema lo identifica con una cookie que genera el servidor, para que pueda volver a ver sus tickets desde el mismo navegador.
 * No hay cola virtual ni cola de preparación: la barra prepara el pedido en el momento del retiro. Para que pueda anticiparse, cuenta con un panel de demanda pendiente (por ejemplo, "34 gin tonic por entregar") que le permite reponer insumos antes de quedarse sin ellos.
-* El Producto Mínimo Viable (MVP) abarcará una interfaz para el cliente final, una interfaz simplificada para el personal de barra orientada al escaneo y entrega, y un panel para el organizador donde gestiona catálogos, eventos y staff.
-* En esta primera etapa se utilizará un entorno de simulación para los pagos, dejando la integración de pasarelas financieras reales sujeta a la aprobación del tutor o para futuras escalabilidades.
-* No habrá preventa: solo se puede comprar mientras el evento está en curso.
+* El Producto Mínimo Viable (MVP) abarca una interfaz para el cliente final, una interfaz simplificada para el personal de barra orientada al escaneo y entrega, y un panel para el organizador donde gestiona su catálogo, sus eventos y el staff de cada uno.
+* Los pagos son simulados: el asistente elige aprobar o rechazar el pago. La integración con una pasarela real (Mercado Pago) queda como evolución futura.
+* No hay preventa: solo se puede comprar mientras el evento está en curso.
 
 ## 3. Modelo Funcional
 * **Roles**: el **Organizador** (la productora) administra su catálogo maestro, crea eventos y asigna al personal. El **Staff** edita solo el catálogo de su evento y escanea tickets. El **Asistente** compra sin cuenta. Existe además un administrador de la plataforma que se crea por seed.
@@ -63,12 +63,12 @@
 
 ## 5. Stack Tecnológico y Arquitectura Cloud
 * **Arquitectura**: aplicación web cliente-servidor. El backend es un monolito modular en capas y el frontend es una sola aplicación con tres áreas: cliente, barra y Panel del Organizador. El detalle está en [docs/arquitectura.md](docs/arquitectura.md).
-* **Frontend**: Next.js con TypeScript. Su renderizado optimizado ayuda a que el catálogo cargue rápido al escanear el QR, algo importante para la UX durante el evento. El frontend será desplegado en Vercel para aprovechar el CDN global y el deploy continuo.
-* **Backend (API Rest)**: NestJS con TypeScript. Ofrece una arquitectura modular y tipada. Su entorno Node.js maneja bien la asincronía, lo que le permite atender varias peticiones de compra simultáneas sin bloquear el servidor. Será alojado en Railway.
+* **Frontend**: Next.js con TypeScript. Su renderizado optimizado ayuda a que el catálogo cargue rápido al escanear el QR, algo importante para la UX durante el evento. El frontend está desplegado en Vercel para aprovechar el CDN global y el deploy continuo.
+* **Backend (API Rest)**: NestJS con TypeScript. Ofrece una arquitectura modular y tipada. Su entorno Node.js maneja bien la asincronía, lo que le permite atender varias peticiones de compra simultáneas sin bloquear el servidor. Está alojado en Railway.
 * **Base de Datos**: PostgreSQL. Es un motor relacional con soporte de transacciones, que usamos para que la reserva de stock y el canje de tickets se hagan de forma atómica, con una estructura de datos predecible y fácil de mantener respecto a motores NoSQL.
 * **Acceso a datos**: Prisma, con tipos generados desde el esquema y migraciones versionadas.
-* **Infraestructura Interna**: La base de datos y el backend estarán configurados dentro del mismo entorno de proyecto en Railway, lo que reduce la latencia de la conexión interna y facilita el despliegue automático desde GitHub.
-* **Concurrencia**: como objetivo de diseño tomamos un evento de hasta 1.500 asistentes, con un pico de 100 compras por minuto. No es un límite garantizado sino la carga con la que vamos a probar el sistema. La consistencia bajo carga no depende de la velocidad del servidor sino de que la reserva de stock y el canje se resuelvan como operaciones atómicas en PostgreSQL: aunque dos personas compren la última unidad o dos barras escaneen el mismo QR al mismo tiempo, solo una operación se concreta.
+* **Infraestructura Interna**: La base de datos y el backend están configurados dentro del mismo proyecto de Railway, lo que reduce la latencia de la conexión interna y facilita el despliegue automático desde GitHub.
+* **Concurrencia**: como objetivo de diseño tomamos un evento de hasta 1.500 asistentes, con un pico de 100 compras por minuto. Es una referencia de diseño, no una carga medida: no se hizo una prueba de carga. La consistencia no depende de la velocidad del servidor sino de que la reserva de stock y el canje se resuelvan como operaciones atómicas en PostgreSQL: aunque dos personas compren la última unidad o dos barras escaneen el mismo QR al mismo tiempo, solo una operación se concreta. Eso sí está probado con tests de concurrencia.
 
 ## 6. Estructura del Repositorio
 ```
@@ -76,7 +76,7 @@
 ├── README.md
 ├── docker-compose.yml  PostgreSQL local para desarrollo
 ├── backend/            API REST en NestJS + Prisma, con sus tests
-├── frontend/           App Next.js con las áreas cliente y barra
+├── frontend/           App Next.js con las áreas cliente, barra y Panel del Organizador
 ├── database/
 │   ├── der.md          diagrama entidad-relación
 │   ├── ddl.sql         creación de tablas, claves e índices
@@ -85,27 +85,29 @@
     ├── arquitectura.md
     ├── modulos.md
     ├── deploy.md       despliegue en Railway y Vercel
+    ├── informe-final.md
     └── informes/       informes de avance
 ```
 
 Los nombres de tablas, columnas, variables y archivos de código están en inglés; la documentación, en español.
 
 ## 7. Control de Versiones y Auditoría
-* Todo el código fuente del proyecto se gestionará utilizando Git. 
-* El repositorio de GitHub actuará como fuente oficial para la auditoría del trabajo colaborativo, la revisión de ramas y el seguimiento constante de commits por parte de la cátedra y el tutor.
+* Todo el código fuente del proyecto se gestiona con Git.
+* El repositorio de GitHub es la fuente oficial para la auditoría del trabajo colaborativo, la revisión de ramas y el seguimiento constante de commits por parte de la cátedra y el tutor.
 * Ramas: `main` tiene la versión entregable y `dev` el desarrollo en curso. Los cambios pasan de `dev` a `main` con un pull request.
 
 ## 8. Estado de la Implementación
 Implementado y probado:
-* **Cliente**: QR de acceso al evento, catálogo, carrito dividido en tickets, reserva de stock, pago simulado (aprobado o rechazado), mis tickets con su QR de retiro.
+* **Cliente**: QR de acceso al evento, catálogo, carrito dividido en tickets (con duplicar y dividir), reserva de stock, pago simulado (aprobado o rechazado), cancelación del pedido pendiente, mis tickets con su QR de retiro, historial y repetir compra.
 * **Barra**: login de organizadores y staff, escáner de QR con canje atómico, panel de precio, stock y disponibilidad, y demanda pendiente.
-* **Panel del Organizador**: crear, editar y eliminar eventos según su estado, QR de acceso para imprimir, asignación de staff y catálogo maestro de productos.
+* **Panel del Organizador**: crear, editar y eliminar eventos según su estado, QR de acceso para imprimir, asignación de staff, catálogo maestro de productos y oferta de cada evento.
 * **Seguridad**: control de acceso por cliente, staff y productora (IDOR), CSRF, límite de intentos de login y encabezados de seguridad.
 * **Reglas críticas** cubiertas por tests contra PostgreSQL: reserva de todo el pedido o nada, última unidad con compras simultáneas, vencimiento de la reserva, aprobación tardía, numeración de tickets, doble escaneo simultáneo y separación entre productoras.
 
 Fuera de esta entrega:
 * **Integración con Mercado Pago**: el pago es simulado.
-* Alta de staff por invitación (los usuarios de staff se cargan con el seed) y métricas de venta.
+* Alta de productoras y de staff por invitación (se cargan con el seed) y métricas de venta.
+* Prueba de carga y prueba con público en un evento real.
 
 ## 9. Cómo Ejecutarlo
 Requiere Node.js 22 o superior y Docker (para la base de datos).

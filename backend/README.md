@@ -8,18 +8,14 @@ backend/
 ├── src/
 │   ├── common/             errores, validación y utilidades compartidas
 │   └── modules/
-│       ├── auth/           login, sesiones, permisos e invitaciones
-│       ├── organizations/  productoras
-│       ├── users/          organizadores, staff y asignaciones a eventos
-│       ├── catalog/        productos y categorías
-│       ├── events/         eventos y QR de acceso
-│       ├── offers/         oferta del evento y demanda pendiente
+│       ├── auth/           login, sesiones, permisos y límite de intentos
+│       ├── catalog/        catálogo maestro de productos
+│       ├── events/         catálogo del evento y eventos del organizador
+│       ├── offers/         oferta del evento, registro de cambios y demanda pendiente
 │       ├── customers/      clientes invitados
-│       ├── orders/         pedidos y reserva de stock
-│       ├── payments/       pagos (providers/: simulado y Mercado Pago)
-│       ├── tickets/        tickets y canje
-│       ├── audit/          registro de cambios
-│       └── reports/        reportes
+│       ├── orders/         pedidos, reserva de stock y vencimiento
+│       ├── payments/       pago simulado
+│       └── tickets/        tickets y canje
 └── test/                   tests de integración y de concurrencia
 ```
 
